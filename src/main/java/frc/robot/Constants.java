@@ -16,4 +16,11 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+    public static final int SHOOTER_WHEEL_PORT = -1;
+    public static final int HOOD_MOTOR_PORT = -1;
+    public static final int BONKER_PORT = -1;
+    public static final int PULSE_PER_ROTATION = 800;
+    public static final int SHOOTER_KS = -1;
+    public static final int VACUM_MOTOR = -1;
+    public static final double SHOOTER_DIAMETER = -1; //in meters
 }

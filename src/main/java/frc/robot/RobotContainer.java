@@ -67,7 +67,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command[] getAutonomousCommands() {
-    final String trajectoryJSON = "paths/YourPath.wpilib.json";
+    final String trajectoryJSON = "paths/output/Test.wpilib.json";
     Trajectory trajectory = new Trajectory();
 
     try {

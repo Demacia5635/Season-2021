@@ -55,7 +55,7 @@ public final class Constants {
     public static final int BackLeftID = 4;
     public static final int FrontRightID = 2;
     public static final int FrontLeftID = 3;
-    public static final int GyroID = 3;
+    public static final int GyroID = 11;
 
     // Wheel shit
     public static final double CheesyPuffsMeter = 2.54 / 100.;

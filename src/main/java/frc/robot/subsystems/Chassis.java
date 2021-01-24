@@ -101,24 +101,29 @@ public class Chassis extends SubsystemBase {
   }
 
   /**
-   * Controls the left and right sides of the drive directly with voltages.
+   * Controls the left and right sides of the drive directly with velocities.
    *
    * @param leftVelocity  the commanded left velocity
    * @param rightVelocity the commanded right velocity
    */
   public void setVelocity(double leftVelocity, double rightVelocity) {
-    double leftVelPulse = leftVelocity * Constants.pulseInMeter / 10;
-    double rightVelPulse = rightVelocity * Constants.pulseInMeter / 10;
-    double leftA = (leftVelPulse
-        - BackLeft.getSelectedSensorVelocity() / Constants.pulseInMeter * 10);
-    double rightA = (rightVelPulse
-        - FrontRight.getSelectedSensorVelocity() / Constants.pulseInMeter * 10);
-    double leftAFeedforward = feedforward.calculate(leftVelPulse, leftA) / 12;
-    double rightAFeedforward = feedforward.calculate(rightVelPulse, rightA) / 12;
+    setVelocity(leftVelocity, true);
+    setVelocity(rightVelocity, false);
+  }
 
-    BackLeft.set(ControlMode.Velocity, leftVelPulse, DemandType.ArbitraryFeedForward,
-        leftAFeedforward);
-    FrontRight.set(ControlMode.Velocity, rightVelPulse, DemandType.ArbitraryFeedForward,
-        rightAFeedforward);
+  /**
+   * Controls either one of the sides of the drive directly with velocity.
+   *
+   * @param vel    the wanted velocity
+   * @param isLeft whether it should change the left or right side's velocities
+   */
+  public void setVelocity(double vel, boolean isLeft) {
+    double velPulse = vel * Constants.pulseInMeter / 10;
+    double a = velPulse - ((isLeft ? BackLeft : FrontRight).getSelectedSensorVelocity()
+        / Constants.pulseInMeter * 10);
+    double aFeedforward = feedforward.calculate(velPulse, a) / 12;
+
+    (isLeft ? BackLeft : FrontRight).set(ControlMode.Velocity, velPulse,
+        DemandType.ArbitraryFeedForward, aFeedforward);
   }
 }

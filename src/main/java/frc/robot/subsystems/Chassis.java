@@ -14,6 +14,7 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
@@ -26,6 +27,8 @@ public class Chassis extends SubsystemBase {
   private final TalonSRX FrontRight = new TalonSRX(Constants.FrontRightID);
   private final PigeonIMU gyro = new PigeonIMU(Constants.GyroID);
   private final DifferentialDriveOdometry odometry;
+  private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.ks,
+      Constants.kv, Constants.ka);
 
   private double baseAngle;
 
@@ -104,21 +107,18 @@ public class Chassis extends SubsystemBase {
    * @param rightVelocity the commanded right velocity
    */
   public void setVelocity(double leftVelocity, double rightVelocity) {
-    double leftVelPulse = leftVelocity / Constants.pulseInMeter / 10;
-    double rightVelPulse = rightVelocity / Constants.pulseInMeter / 10;
+    double leftVelPulse = leftVelocity * Constants.pulseInMeter / 10;
+    double rightVelPulse = rightVelocity * Constants.pulseInMeter / 10;
+    double leftA = (leftVelPulse
+        - BackLeft.getSelectedSensorVelocity() / Constants.pulseInMeter * 10);
+    double rightA = (rightVelPulse
+        - FrontRight.getSelectedSensorVelocity() / Constants.pulseInMeter * 10);
+    double leftAFeedforward = feedforward.calculate(leftVelPulse, leftA) / 12;
+    double rightAFeedforward = feedforward.calculate(rightVelPulse, rightA) / 12;
 
-    if (leftVelocity == 0) {
-      BackLeft.set(ControlMode.Velocity, 0, DemandType.ArbitraryFeedForward, 0);
-    } else {
-      BackLeft.set(ControlMode.Velocity, -leftVelPulse, DemandType.ArbitraryFeedForward,
-          (leftVelocity * Constants.ks + Constants.kv) / 12);
-    }
-
-    if (rightVelocity == 0) {
-      FrontRight.set(ControlMode.Velocity, 0, DemandType.ArbitraryFeedForward, 0);
-    } else {
-      FrontRight.set(ControlMode.Velocity, -rightVelPulse, DemandType.ArbitraryFeedForward,
-          (rightVelocity * Constants.ks + Constants.kv) / 12);
-    }
+    BackLeft.set(ControlMode.Velocity, leftVelPulse, DemandType.ArbitraryFeedForward,
+        leftAFeedforward);
+    FrontRight.set(ControlMode.Velocity, rightVelPulse, DemandType.ArbitraryFeedForward,
+        rightAFeedforward);
   }
 }

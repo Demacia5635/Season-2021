@@ -15,30 +15,47 @@ public class Shoot extends CommandBase {
   private double vel;
   private double angle;
   public Shoot(Shooting shooting, double velocity, double angle) {
+    addRequirements(shooting);
     this.shooting = shooting;
     this.vel = velocity;
     this.angle = angle;
+  }
+
+  public static enum ShootType{
+    onClick,
+    onHold
   }
 
   @Override
   public void initialize() {
     shooting.setHoodAngle(angle);
     shooting.setWheelVel(vel);
+    shooting.setBonk(1);
+    shooting.setVacuum(false);
   }
 
   @Override
   public void execute() {
-    if (Math.abs(shooting.getWheelVel() - vel) <= 0.01 && Math.abs(shooting.getHoodAngle() - angle) <= 0.1){
-      
+    if (shooting.getMaxLim()){
+      shooting.setBonk(0);
+      if (Math.abs(shooting.getWheelVel() - vel) <= 0.01 
+      && Math.abs(shooting.getHoodAngle() - angle) <= 0.1){
+      shooting.setVacuum(true);
+      }
     }
   }
 
   @Override
   public void end(boolean interrupted) {
+    shooting.setHoodAngle(0);
+    shooting.setWheelVel(0);
+    shooting.setVacuum(false);
+    Bonk bonk = new Bonk(shooting, false);
+    bonk.schedule();
   }
 
   @Override
-  public boolean isFinished() {
+  public boolean isFinished(){
     return false;
   }
 }

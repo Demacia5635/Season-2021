@@ -114,16 +114,19 @@ public class Chassis extends SubsystemBase {
   /**
    * Controls either one of the sides of the drive directly with velocity.
    *
-   * @param vel    the wanted velocity
-   * @param isLeft whether it should change the left or right side's velocities
+   * @param setPoint the wanted velocity
+   * @param isLeft   whether it should change the left or right side's velocity
    */
-  public void setVelocity(double vel, boolean isLeft) {
-    double velPulse = vel * Constants.pulseInMeter / 10;
-    double a = velPulse - ((isLeft ? BackLeft : FrontRight).getSelectedSensorVelocity()
-        / Constants.pulseInMeter * 10);
-    double aFeedforward = feedforward.calculate(velPulse, a) / 12;
+  public void setVelocity(double setPoint, boolean isLeft) {
+    double outputVel = setPoint * Constants.pulseInMeter / 10;
 
-    (isLeft ? BackLeft : FrontRight).set(ControlMode.Velocity, velPulse,
-        DemandType.ArbitraryFeedForward, aFeedforward);
+    double presentValue = (isLeft ? BackLeft : FrontRight).getSelectedSensorVelocity()
+        / Constants.pulseInMeter * 10;
+    double error = setPoint - presentValue;
+    double acceleration = error / 0.1;
+    double calcFeedforward = feedforward.calculate(setPoint, acceleration);
+
+    (isLeft ? BackLeft : FrontRight).set(ControlMode.Velocity, outputVel,
+        DemandType.ArbitraryFeedForward, calcFeedforward);
   }
 }

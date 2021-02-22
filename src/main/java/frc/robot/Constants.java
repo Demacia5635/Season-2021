@@ -24,4 +24,26 @@ public final class Constants {
     public static final int vacuumMotor = -1;
     public static final int maxLim = -1;
     public static final int minLim = -1;
+
+    public static int rightFront = 2;
+    public static int rightBack = 1;
+    public static int leftFront = 3;
+    public static int leftBack = 4;
+    public static int gyroPort = 0;
+
+    public static int xboxPort = 0;
+
+    public static double robotLength = 0.575;//meters
+    public static double maxVelocity = 4;//meters per second
+    public static double maxRadialAccelaration = 16;//meters per squared second
+    public static double maxAngularVelocity = Math.PI;//radians per second
+
+    public static double pulsesPerMeter = pulsePerRotation / (0.1524 * Math.PI);
+
+    public static final double kp = 0.01;
+    public static final double ki = 0;
+    public static final double ks = 0.797;
+    public static final double kv = 2.54;
+    public static final double ka = 0.862;
+    public static final double kd = 0;
 }

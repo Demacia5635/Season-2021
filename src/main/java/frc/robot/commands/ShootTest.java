@@ -59,5 +59,6 @@ public class ShootTest extends CommandBase {
   private void shoot(double vel, double angle){
     new Shoot(shooting, vel, angle).withTimeout(10).schedule();
   }
+  
   private void NextPos(){}
 }

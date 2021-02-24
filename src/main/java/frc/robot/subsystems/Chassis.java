@@ -159,7 +159,7 @@ public class Chassis extends SubsystemBase implements Sendable {
         left = velocity;
       }
     }
-    setVelocity(right, left);
+    setVelocity(left, right);
   }
 
   //
@@ -171,44 +171,21 @@ public class Chassis extends SubsystemBase implements Sendable {
   public void angularVelocity(double velocity, double turns) {
     velocity = velocity * Constants.maxVelocity;
     turns = turns * Constants.maxAngularVelocity;
-    double right = 0.5;
-    double left = 0.5;
+    double right = 0;
+    double left = 0;
     if (velocity > 0) {
-      if (turns > 0) {
-        right = ((velocity / turns) - (Constants.robotLength / 2)) * turns;
-        left = ((velocity / turns) + (Constants.robotLength / 2)) * turns;
-      } else if (turns < 0) {
-        right = ((velocity / (-turns)) + (Constants.robotLength / 2)) * (-turns);
-        left = ((velocity / (-turns)) - (Constants.robotLength / 2)) * (-turns);
-      } else {
-        right = velocity;
-        left = velocity;
-      }
-    } else if (velocity < 0) {
-      if (turns > 0) {
-        right = -((((-velocity) / turns) - (Constants.robotLength / 2)) * turns);
-        left = -((((-velocity) / turns) + (Constants.robotLength / 2)) * turns);
-      } else if (turns < 0) {
-        right = -(((velocity / turns) + (Constants.robotLength / 2)) * (-turns));
-        left = -(((velocity / turns) - (Constants.robotLength / 2)) * (-turns));
-      } else {
-        right = velocity;
-        left = velocity;
-      }
-    } else {
-      turns = turns * 2;
-      if (turns > 0) {
-        right = -(turns * Constants.robotLength / 2);
-        left = (turns * Constants.robotLength / 2);
-      } else if (turns < 0) {
-        right = -(turns * Constants.robotLength / 2);
-        left = (turns * Constants.robotLength / 2);
-      } else {
-        right = velocity;
-        left = velocity;
-      }
+      right = velocity - turns * (0.575 / 2);
+      left = velocity + turns * (0.575 / 2);
+    } 
+    else if (velocity < 0) {
+      right = velocity + turns * (0.575 / 2);
+      left = velocity - turns * (0.575 / 2);
+    } 
+    else {
+      right = -turns * (0.575 / 2);
+      left = turns * (0.575 / 2);
     }
-    setVelocity(right, left);
+    setVelocity(left, right);
   }
 
   public void arcadeDrive(double xSpeed, double zRotation, boolean squareInputs) {

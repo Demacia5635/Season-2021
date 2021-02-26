@@ -7,18 +7,25 @@
 
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Shooting;
 
 public class Shoot extends CommandBase {
   private Shooting shooting;
-  private double vel;
-  private double angle;
+  private double vel, angle;
+  private DoubleSupplier velGetter, angleGetter;
   public Shoot(Shooting shooting, double velocity, double angle) {
     addRequirements(shooting);
     this.shooting = shooting;
     this.vel = velocity;
     this.angle = angle;
+  }
+
+  public Shoot(Shooting shooting, DoubleSupplier velGetter, DoubleSupplier angleGetter){
+    this.velGetter = velGetter;
+    this.angleGetter = angleGetter;
   }
 
   public static enum ShootType{
@@ -28,20 +35,21 @@ public class Shoot extends CommandBase {
 
   @Override
   public void initialize() {
-    shooting.setHoodAngle(angle);
-    shooting.setWheelVel(vel);
-    shooting.setBonk(1);
+    shooting.setBonk(0);
     shooting.setVacuum(false);
   }
 
   @Override
   public void execute() {
+    shooting.setHoodAngle(angleGetter.getAsDouble());
+    shooting.setWheelVel(velGetter.getAsDouble());
     if (shooting.getMaxLim()){
       shooting.setBonk(0);
-      if (Math.abs(shooting.getWheelVel() - vel) <= 0.01 
+    } else
+    if (Math.abs(shooting.getWheelVel() - vel) <= 0.01 
       && Math.abs(shooting.getHoodAngle() - angle) <= 0.1){
+      if (!shooting.getMaxLim()) shooting.setBonk(1);
       shooting.setVacuum(true);
-      }
     }
   }
 

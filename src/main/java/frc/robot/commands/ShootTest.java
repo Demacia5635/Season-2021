@@ -4,8 +4,6 @@
 
 package frc.robot.commands;
 
-import java.util.HashMap;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Shooting;
@@ -14,7 +12,6 @@ import frc.robot.subsystems.Chassis;
 public class ShootTest extends CommandBase {
   private Shooting shooting;
   private Chassis chassis;
-  private HashMap<Double, Double> map = new HashMap<>();
 
   public ShootTest(Shooting shooting, Chassis chassis) {
     this.shooting = shooting;
@@ -38,17 +35,15 @@ public class ShootTest extends CommandBase {
       shoot(vel, angle);
       SmartDashboard.putBoolean("Shoot", false);
     }
-    else if (SmartDashboard.getBoolean("Save", false))
+    else if (SmartDashboard.getBoolean("NextPos", false))
     {
-      map.put(SmartDashboard.getNumber("Distance", -1), vel);
-      NextPos();
-      SmartDashboard.putBoolean("Save", false);
+      nextPos();
+      SmartDashboard.putBoolean("NextPos", false);
     }
   }
 
   @Override
   public void end(boolean interrupted) {
-    
   }
 
   @Override
@@ -59,6 +54,6 @@ public class ShootTest extends CommandBase {
   private void shoot(double vel, double angle){
     new Shoot(shooting, vel, angle).withTimeout(10).schedule();
   }
-  
-  private void NextPos(){}
+
+  private void nextPos(){}
 }

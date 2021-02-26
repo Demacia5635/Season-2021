@@ -12,6 +12,7 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -115,5 +116,13 @@ public class Shooting extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.addDoubleProperty("Wheel Velocity", this::getWheelVel, null);
+    builder.addDoubleProperty("Hood Angle", this::getHoodAngle, null);
+    builder.addBooleanProperty("Upper Limit Sensor", this::getMaxLim, null);
+    builder.addBooleanProperty("Lower Limit Sensor", this::getMinLim, null);
   }
 }

@@ -12,7 +12,6 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.controller.ArmFeedforward;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -73,8 +72,7 @@ public class Shooting extends SubsystemBase {
    * 
    * @param on true to make balls go in, false to keep them in the roulette.
    */
-  public void setVacuum(boolean on) {// true to make balls go in, false to keep them going in the
-                                     // roulette.
+  public void setVacuum(boolean on) {
     if (vacuumState == on) return;
     vacuumMotor.set(ControlMode.PercentOutput, on ? 1 : 0);
     vacuumState = on;

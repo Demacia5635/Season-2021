@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Scanner;
 
-import org.ejml.equation.Function;
-
 import java.io.File;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -34,6 +32,72 @@ public class AutoShoot extends CommandBase {
     this.shooting = shooting;
     this.chassis = chassis;
     dictionary = new HashMap<Integer, double[]>();
+    readFile();
+  }
+
+  @Override
+  public void initialize() {
+    command = new TurnToPos(chassis, TurnType.Passive, this::getVisionAngle)
+        .andThen(new Shoot(shooting, this::getVel, this::getAngle)
+            .alongWith(new TurnToPos(chassis, TurnType.Active, this::getVisionAngle)));
+    command.schedule();
+  }
+
+  @Override
+  public void execute() {
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    command.cancel();
+  }
+
+  @Override
+  public boolean isFinished() {
+    return false;
+  }
+
+  /**
+   * 
+   * @return The angle to the basket/hole.
+   */
+  private double getVisionAngle() {
+    return SmartDashboard.getNumber("Angle", -1);
+  }
+
+  /**
+   * Calculates the estimated velocity depending on the distance.
+   * 
+   * @return The velocity of the big wheel.
+   */
+  private double getVel() {
+    int distance = (int) SmartDashboard.getNumber("Distance", -1);
+    int distance1 = distance - distance % 50;
+    int distance2 = distance1 + 50;
+    double vel1 = dictionary.get(distance1)[0];
+    double vel2 = dictionary.get(distance2)[0];
+    return vel1 + ((distance - distance1) / 50.) * (vel2 - vel1);
+  }
+
+  /**
+   * Calculates the estimated angle depending on the distance.
+   * 
+   * @return The angle of the hood.
+   */
+  private double getAngle() {
+    int distance = (int) SmartDashboard.getNumber("Distance", -1);
+    int distance1 = distance - distance % 50;
+    int distance2 = distance1 + 50;
+    double angle1 = dictionary.get(distance1)[1];
+    double angle2 = dictionary.get(distance2)[1];
+    return angle1 + ((distance - distance1) / 50.) * (angle2 - angle1);
+  }
+
+  /**
+   * Reads the data written in the json file located in Utils/Shooting.json and
+   * transferrs it to an HashMap.
+   */
+  private void readFile() {
     firstTime = true;
     cycle = 0;
     int distance = -1;
@@ -62,49 +126,5 @@ public class AutoShoot extends CommandBase {
     } catch (IOException e) {
       System.out.println("Couldn't access file");
     }
-  }
-
-  @Override
-  public void initialize() {
-    command = new TurnToPos(chassis, TurnType.Passive, this::getVisionAngle)
-        .andThen(new Shoot(shooting, this::getVel, this::getAngle)
-            .alongWith(new TurnToPos(chassis, TurnType.Active, this::getVisionAngle)));
-    command.schedule();
-  }
-
-  @Override
-  public void execute() {
-  }
-
-  @Override
-  public void end(boolean interrupted) {
-    command.cancel();
-  }
-
-  @Override
-  public boolean isFinished() {
-    return false;
-  }
-
-  private double getVisionAngle() {
-    return SmartDashboard.getNumber("Angle", -1);
-  }
-
-  private double getVel() {
-    int distance = (int) SmartDashboard.getNumber("Distance", -1);
-    int distance1 = distance - distance % 50;
-    int distance2 = distance1 + 50;
-    double vel1 = dictionary.get(distance1)[0];
-    double vel2 = dictionary.get(distance2)[0];
-    return vel1 + ((distance - distance1) / 50.) * (vel2 - vel1);
-  }
-
-  private double getAngle() {
-    int distance = (int) SmartDashboard.getNumber("Distance", -1);
-    int distance1 = distance - distance % 50;
-    int distance2 = distance1 + 50;
-    double angle1 = dictionary.get(distance1)[1];
-    double angle2 = dictionary.get(distance2)[1];
-    return angle1 + ((distance - distance1) / 50.) * (angle2 - angle1);
   }
 }

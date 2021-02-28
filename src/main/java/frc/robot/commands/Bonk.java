@@ -29,6 +29,6 @@ public class Bonk extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return shooting.getMaxLim() || shooting.getMinLim();
+    return (up ? shooting.getMaxLim() : shooting.getMinLim());
   }
 }

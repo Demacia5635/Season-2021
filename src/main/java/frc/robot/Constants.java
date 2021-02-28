@@ -34,11 +34,11 @@ public final class Constants {
     public static int xboxPort = 0;
 
     public static double robotLength = 0.575;//meters
-    public static double maxVelocity = 4;//meters per second
-    public static double maxRadialAccelaration = 16;//meters per squared second
+    public static double maxVelocity = 2;//meters per second
+    public static double maxRadialAccelaration = 4;//meters per squared second
     public static double maxAngularVelocity = Math.PI;//radians per second
 
-    public static double pulsesPerMeter = pulsePerRotation / (0.1524 * Math.PI);
+    public static double pulsesPerMeter = 1675;
 
     public static final double kp = 0.01;
     public static final double ki = 0;

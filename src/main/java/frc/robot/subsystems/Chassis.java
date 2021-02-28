@@ -120,43 +120,30 @@ public class Chassis extends SubsystemBase implements Sendable {
     turns = turns * Constants.maxRadialAccelaration;
     double right = 0;
     double left = 0;
-    if (velocity > 0) {
+    if (velocity != 0) {
       if (turns > 0) {
-        right = Math.sqrt(((velocity * velocity / turns) - (Constants.robotLength / 2)) * turns);
-        left = Math.sqrt(((velocity * velocity / turns) + (Constants.robotLength / 2)) * turns);
-      } else if (turns < 0) {
-        right = Math
-            .sqrt(((velocity * velocity / (-turns)) + (Constants.robotLength / 2)) * (-turns));
-        left =
-             Math.sqrt(((velocity * velocity / (-turns)) - (Constants.robotLength / 2)) * (-turns));
-      } else {
+        double radius = (velocity * velocity/turns);
+        right = (velocity/radius)*(radius-(Constants.robotLength/2));
+        left = (velocity/radius)*(radius+(Constants.robotLength/2));
+      } 
+      else if (turns < 0) {
+        double radius = (velocity * velocity/(-turns));
+        right = (velocity/radius)*(radius+(Constants.robotLength/2));
+        left = (velocity/radius)*(radius-(Constants.robotLength/2));
+      } 
+      else {
         right = velocity;
         left = velocity;
       }
-    } else if (velocity < 0) {
+    } 
+    else {
       if (turns > 0) {
-        right = -Math.sqrt(((velocity * velocity / turns) - (Constants.robotLength / 2)) * turns);
-        left = -Math.sqrt(((velocity * velocity / turns) + (Constants.robotLength / 2)) * turns);
-      } else if (turns < 0) {
-        right = -Math
-            .sqrt(((velocity * velocity / (-turns)) + (Constants.robotLength / 2)) * (-turns));
-        left = -Math
-            .sqrt(((velocity * velocity / (-turns)) - (Constants.robotLength / 2)) * (-turns));
-      } else {
-        right = velocity;
-        left = velocity;
-      }
-    } else {
-      turns = turns * 0.4;
-      if (turns > 0) {
-        right = -Math.sqrt(turns * Constants.robotLength / 2);
-        left = Math.sqrt(turns * Constants.robotLength / 2);
-      } else if (turns < 0) {
-        right = Math.sqrt((-turns) * Constants.robotLength / 2);
-        left = -Math.sqrt((-turns) * Constants.robotLength / 2);
-      } else {
-        right = velocity;
-        left = velocity;
+        right = -Math.sqrt(turns * (Constants.robotLength / 2));
+        left = Math.sqrt(turns * (Constants.robotLength / 2));
+      } 
+      else {
+        right = Math.sqrt((-turns) * (Constants.robotLength / 2));
+        left = -Math.sqrt((-turns) * (Constants.robotLength / 2));
       }
     }
     setVelocity(left, right);
@@ -174,16 +161,16 @@ public class Chassis extends SubsystemBase implements Sendable {
     double right = 0;
     double left = 0;
     if (velocity > 0) {
-      right = velocity - turns * (0.575 / 2);
-      left = velocity + turns * (0.575 / 2);
+      right = velocity - turns * (Constants.robotLength / 2);
+      left = velocity + turns * (Constants.robotLength / 2);
     } 
     else if (velocity < 0) {
-      right = velocity + turns * (0.575 / 2);
-      left = velocity - turns * (0.575 / 2);
+      right = velocity + turns * (Constants.robotLength / 2);
+      left = velocity - turns * (Constants.robotLength / 2);
     } 
     else {
-      right = -turns * (0.575 / 2);
-      left = turns * (0.575 / 2);
+      right = -turns * (Constants.robotLength / 2);
+      left = turns * (Constants.robotLength / 2);
     }
     setVelocity(left, right);
   }

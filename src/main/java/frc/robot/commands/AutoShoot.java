@@ -7,16 +7,20 @@ package frc.robot.commands;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Scanner;
+
+import org.ejml.equation.Function;
+
 import java.io.File;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.TurnToPos.TurnType;
 import frc.robot.subsystems.Chassis;
 import frc.robot.subsystems.Shooting;
 
 public class AutoShoot extends CommandBase {
-  
+
   private Shooting shooting;
   private Chassis chassis;
   private SequentialCommandGroup command;
@@ -34,42 +38,43 @@ public class AutoShoot extends CommandBase {
     cycle = 0;
     int distance = -1;
     double velocity = -1, angle = -1;
-    try
-    {
+    try {
       Scanner scanner = new Scanner(new File(".\\Utils\\Shooting.json"));
-      while (scanner.hasNextLine()){
+      while (scanner.hasNextLine()) {
         String str = scanner.nextLine();
         String value;
-        if(str.contains(":") && !firstTime){
+        if (str.contains(":") && !firstTime) {
           value = str.split(":", 2)[1].split("\"", 3)[1];
-          if (cycle == 0){
+          if (cycle == 0) {
             distance = Integer.parseInt(value);
-            cycle ++;
-          } else if (cycle == 1){
+            cycle++;
+          } else if (cycle == 1) {
             velocity = Double.parseDouble(value);
-            cycle ++;
+            cycle++;
           } else {
             angle = Double.parseDouble(value);
             cycle = 0;
-            dictionary.put(distance, new double[]{velocity, angle});
+            dictionary.put(distance, new double[] { velocity, angle });
           }
         } else if (firstTime && str.contains(":")) firstTime = false;
       }
       scanner.close();
-    }
-    catch (IOException e){
+    } catch (IOException e) {
       System.out.println("Couldn't access file");
     }
   }
 
   @Override
   public void initialize() {
-    command = new TurnToPos(chassis).andThen(new Shoot(shooting, this::getVel, this::getAngle).alongWith(new TurnToPos(chassis)));
+    command = new TurnToPos(chassis, TurnType.Passive, this::getVisionAngle)
+        .andThen(new Shoot(shooting, this::getVel, this::getAngle)
+            .alongWith(new TurnToPos(chassis, TurnType.Active, this::getVisionAngle)));
     command.schedule();
   }
 
   @Override
-  public void execute() {}
+  public void execute() {
+  }
 
   @Override
   public void end(boolean interrupted) {
@@ -81,8 +86,12 @@ public class AutoShoot extends CommandBase {
     return false;
   }
 
-  private double getVel(){
-    int distance = (int)SmartDashboard.getNumber("Distance", -1);
+  private double getVisionAngle() {
+    return SmartDashboard.getNumber("Angle", -1);
+  }
+
+  private double getVel() {
+    int distance = (int) SmartDashboard.getNumber("Distance", -1);
     int distance1 = distance - distance % 50;
     int distance2 = distance1 + 50;
     double vel1 = dictionary.get(distance1)[0];
@@ -90,12 +99,12 @@ public class AutoShoot extends CommandBase {
     return vel1 + ((distance - distance1) / 50.) * (vel2 - vel1);
   }
 
-  private double getAngle(){
-    int distance = (int)SmartDashboard.getNumber("Distance", -1);
+  private double getAngle() {
+    int distance = (int) SmartDashboard.getNumber("Distance", -1);
     int distance1 = distance - distance % 50;
     int distance2 = distance1 + 50;
     double angle1 = dictionary.get(distance1)[1];
     double angle2 = dictionary.get(distance2)[1];
     return angle1 + ((distance - distance1) / 50.) * (angle2 - angle1);
-  } 
+  }
 }

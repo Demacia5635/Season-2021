@@ -30,13 +30,10 @@ public class ShootTest extends CommandBase {
   public void execute() {
     double vel = SmartDashboard.getNumber("Velocity for shooting", 1);
     double angle = SmartDashboard.getNumber("Angle for shooting", 1);
-    if (SmartDashboard.getBoolean("Shoot", false))
-    {
+    if (SmartDashboard.getBoolean("Shoot", false)) {
       shoot(vel, angle);
       SmartDashboard.putBoolean("Shoot", false);
-    }
-    else if (SmartDashboard.getBoolean("NextPos", false))
-    {
+    } else if (SmartDashboard.getBoolean("NextPos", false)) {
       nextPos();
       SmartDashboard.putBoolean("NextPos", false);
     }
@@ -51,9 +48,10 @@ public class ShootTest extends CommandBase {
     return false;
   }
 
-  private void shoot(double vel, double angle){
+  private void shoot(double vel, double angle) {
     new Shoot(shooting, vel, angle).withTimeout(10).schedule();
   }
 
-  private void nextPos(){}
+  private void nextPos() {
+  }
 }

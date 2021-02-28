@@ -33,12 +33,12 @@ public class Roulette extends SubsystemBase {
   /**
    * @return A StartEndCommand that starts the roulette's spin
    */
-  public StartEndCommand getSpinCommand(){
+  public StartEndCommand getSpinCommand() {
     return new StartEndCommand(this::startSpin, this::stopSpin, this);
   }
 
   @Override
   public void periodic() {
-    
+
   }
 }

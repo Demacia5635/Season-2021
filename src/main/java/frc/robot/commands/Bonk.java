@@ -10,6 +10,7 @@ import frc.robot.subsystems.Shooting;
 public class Bonk extends CommandBase {
   private Shooting shooting;
   private boolean up;
+
   public Bonk(Shooting shooting, boolean up) {
     addRequirements(shooting);
     this.shooting = shooting;

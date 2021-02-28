@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Pickup extends SubsystemBase {
-  
+
   private TalonSRX pickupMotor;
   private TalonSRX armMotor;
 
@@ -24,20 +24,20 @@ public class Pickup extends SubsystemBase {
     pickupMotor = new TalonSRX(Constants.PICKUP_MOTOR_PORT);
     armMotor = new TalonSRX(Constants.ARM_MOTOR_PORT);
     armMotor.config_kP(0, Constants.ARM_KP);
-    armMotor.configSelectedFeedbackCoefficient(360./800.);
+    armMotor.configSelectedFeedbackCoefficient(360. / 800.);
   }
 
   /**
    * Starts the pickup.
    */
-  public void startPickup(){
+  public void startPickup() {
     pickupMotor.set(ControlMode.PercentOutput, 1);
   }
 
   /**
    * Stops the pickup.
    */
-  public void stopPickup(){
+  public void stopPickup() {
     pickupMotor.set(ControlMode.PercentOutput, 0);
   }
 
@@ -45,15 +45,16 @@ public class Pickup extends SubsystemBase {
    * 
    * @return The arm motor angle in degrees : 0 = start position.
    */
-  public double getArmPosition(){
+  public double getArmPosition() {
     return armMotor.getSelectedSensorPosition();
   }
 
   /**
    * Sets the angle of the arm motor.
+   * 
    * @param angle 0 is the starting position, positive means more down.
    */
-  public void setArm(int angle){
+  public void setArm(int angle) {
     armMotor.set(ControlMode.Position, angle);
   }
 
@@ -61,7 +62,7 @@ public class Pickup extends SubsystemBase {
    * 
    * @return A StartEndCommand that starts the pickup.
    */
-  public StartEndCommand getPickupCommand(){
+  public StartEndCommand getPickupCommand() {
     return new StartEndCommand(this::startPickup, this::stopPickup, this);
   }
 

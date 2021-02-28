@@ -4,32 +4,63 @@
 
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Chassis;
 
 public class TurnToPos extends CommandBase {
 
   private Chassis chassis;
+  private TurnType type;
+  private DoubleSupplier angleGetter;
 
-  public TurnToPos(Chassis chassis) {
+  public TurnToPos(Chassis chassis, TurnType type, DoubleSupplier angleGetter) {
     this.chassis = chassis;
+    this.type = type;
+    this.angleGetter = angleGetter;
     addRequirements(chassis);
+  }
+
+  public static enum TurnType {
+    Active, Passive
   }
 
   @Override
   public void initialize() {
-    
+    switch (type) {
+      case Passive:
+        // Turn by angle
+        break;
+      default:
+        break;
+    }
   }
 
   @Override
-  public void execute() {}
+  public void execute() {
+    switch (type) {
+      case Active:
+        // Turn by angle
+        break;
+      default:
+        break;
+    }
+  }
 
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    // Stop
+  }
 
   @Override
   public boolean isFinished() {
-    return false;
+    switch (type) {
+      case Passive:
+        return Math.abs(angleGetter.getAsDouble()) <= 1;
+      default:
+        return false;
+    }
   }
 
 }

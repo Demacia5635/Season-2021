@@ -8,13 +8,12 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Pickup;
 
 public class ArmChange extends CommandBase {
-  
+
   private Pickup pickup;
   private Position pos;
+
   public enum Position {
-    Top,
-    Bottom,
-    Middle
+    Top, Bottom, Middle
   }
 
   public ArmChange(Position pos, Pickup pickup) {
@@ -25,7 +24,7 @@ public class ArmChange extends CommandBase {
 
   @Override
   public void initialize() {
-    switch (pos){
+    switch (pos) {
       case Top:
         pickup.setArm(0);
         break;
@@ -41,7 +40,7 @@ public class ArmChange extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    switch (pos){
+    switch (pos) {
       case Top:
         return Math.abs(pickup.getArmPosition()) <= 2;
       case Bottom:

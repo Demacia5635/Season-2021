@@ -109,12 +109,12 @@ public class Chassis extends SubsystemBase implements Sendable {
     return left.getVelocity();
   }
 
-  //
-  // gets 2 values between 1 to -1 one to determine the tangent velocity and the
-  // other determines the
-  // radial accelaration of the robot the function sets calculated values for the
-  // right and left motors
-  //
+  /** 
+  gets 2 values between 1 to -1 one to determine the tangent velocity and the
+  other determines the
+  radial accelaration of the robot the function sets calculated values for the
+  right and left motors
+  */
   public void radialAccelaration(double velocity, double turns) {
     velocity = velocity * Constants.maxVelocity;
     turns = turns * Constants.maxRadialAccelaration;
@@ -162,12 +162,12 @@ public class Chassis extends SubsystemBase implements Sendable {
     setVelocity(left, right);
   }
 
-  //
-  // gets 2 values between 1 to -1 one to determine the tangent velocity and the
-  // other determines the
-  // angular velocity of the robot the function sets calculated values for the
-  // right and left motors
-  //
+  /** 
+  gets 2 values between 1 to -1 one to determine the tangent velocity and the
+  other determines the
+  angular velocity of the robot the function sets calculated values for the
+  right and left motors
+  */
   public void angularVelocity(double velocity, double turns) {
     velocity = velocity * Constants.maxVelocity;
     turns = turns * Constants.maxAngularVelocity;

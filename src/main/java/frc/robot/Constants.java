@@ -25,25 +25,25 @@ public final class Constants {
     public static final int maxLim = -1;
     public static final int minLim = -1;
 
-    public static int rightFront = 2;
-    public static int rightBack = 1;
-    public static int leftFront = 3;
-    public static int leftBack = 4;
-    public static int gyroPort = 0;
+    public static int RIGHT_FRONT = 1;
+    public static int RIGHT_BACK = 2;
+    public static int LEFT_FRONT = 3;
+    public static int LEFT_BACK = 4;
+    public static int GYRO_PORT = 0;
 
-    public static int xboxPort = 0;
+    public static int XBOX_PORT = 0;
 
-    public static final double robotTrackWidth = 0.575; // In meters
-    public static double maxVelocity = 2;//meters per second
-    public static double maxRadialAccelaration = 4;//meters per squared second
-    public static double maxAngularVelocity = Math.PI;//radians per second
+    public static final double ROBOT_TRACK_WIDTH = 0.575; // In meters
+    public static double MAX_VELOCITY = 2; // In meters per second
+    public static double MAX_RADIAL_ACCELARATION = 4; // In meters per squared second
+    public static double MAX_ANGULAR_VELOCITY = Math.PI; // In radians per second
 
-    public static double pulsesPerMeter = 1675;
+    public static double PULSES_PER_METER = 1675;
 
-    public static final double kp = 0.01;
-    public static final double ki = 0;
-    public static final double ks = 0.797;
-    public static final double kv = 2.54;
-    public static final double ka = 0.862;
-    public static final double kd = 0;
+    public static final double KP = 0.01;
+    public static final double KI = 0;
+    public static final double KD = 0;
+    public static final double KS = 0.797;
+    public static final double KV = 2.54;
+    public static final double KA = 0.862;
 }

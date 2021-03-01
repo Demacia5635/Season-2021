@@ -73,6 +73,10 @@ public class Chassis extends SubsystemBase {
     this.right.setVelocity(right, feedforward);
   }
 
+  public double getFusedHeading(){
+    return gyro.getFusedHeading();
+  }
+
   public double getAngle() {
     double angle = gyro.getFusedHeading();
 

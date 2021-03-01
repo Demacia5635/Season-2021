@@ -102,7 +102,7 @@ public class AutoShoot extends CommandBase {
     int distance = -1;
     double velocity = -1, angle = -1;
     try {
-      Scanner scanner = new Scanner(new File(".\\Utils\\Shooting.json"));
+      Scanner scanner = new Scanner(new File(".\\utils\\Shooting.json"));
       while (scanner.hasNextLine()) {
         String str = scanner.nextLine();
         String value;

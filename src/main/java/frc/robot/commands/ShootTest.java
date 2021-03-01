@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Shooting;
 import frc.robot.subsystems.Chassis;
-import frc.robot.commands.GoTo;
 
 public class ShootTest extends CommandBase {
   private Shooting shooting;
@@ -60,6 +59,6 @@ public class ShootTest extends CommandBase {
   }
 
   private void nextPos() {
-    new GoTo(-0.5, chassis);
+    new GoTo(chassis, -0.5);
   }
 }

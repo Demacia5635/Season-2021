@@ -14,6 +14,7 @@ public class TurnToPos extends CommandBase {
   private Chassis chassis;
   private TurnType type;
   private DoubleSupplier angleGetter;
+  private double startAngle;
 
   public TurnToPos(Chassis chassis, TurnType type, DoubleSupplier angleGetter) {
     this.chassis = chassis;
@@ -28,6 +29,7 @@ public class TurnToPos extends CommandBase {
 
   @Override
   public void initialize() {
+    startAngle = chassis.getFusedHeading();
     switch (type) {
       case Passive:
         // Turn by angle
@@ -50,7 +52,7 @@ public class TurnToPos extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    // Stop
+    chassis.setVelocity(0, 0);
   }
 
   @Override

@@ -29,10 +29,6 @@ import frc.robot.utils.GroupOfMotors;
 public class Chassis extends SubsystemBase {
 
   // TO DO: check the engines direction, maybe invert
-  private WPI_TalonSRX rightFront;
-  private WPI_TalonSRX leftFront;
-  private WPI_TalonSRX rightBack;
-  private WPI_TalonSRX leftBack;
   private final DifferentialDriveOdometry m_odometry;
   private GroupOfMotors right;
   private GroupOfMotors left;
@@ -47,10 +43,10 @@ public class Chassis extends SubsystemBase {
    * Creates a new Chassis.
    */
   public Chassis(DriveStates dStates) {
-    rightFront = new WPI_TalonSRX(Constants.RIGHT_FRONT);
-    leftFront = new WPI_TalonSRX(Constants.LEFT_FRONT);
-    rightBack = new WPI_TalonSRX(Constants.RIGHT_BACK);
-    leftBack = new WPI_TalonSRX(Constants.LEFT_BACK);
+    WPI_TalonSRX rightFront = new WPI_TalonSRX(Constants.RIGHT_FRONT);
+    WPI_TalonSRX leftFront = new WPI_TalonSRX(Constants.LEFT_FRONT);
+    WPI_TalonSRX rightBack = new WPI_TalonSRX(Constants.RIGHT_BACK);
+    WPI_TalonSRX leftBack = new WPI_TalonSRX(Constants.LEFT_BACK);
 
     rightFront.setInverted(true);
     leftFront.setInverted(true);
@@ -204,8 +200,8 @@ public class Chassis extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    leftFront.setSelectedSensorPosition(0);
-    rightFront.setSelectedSensorPosition(0);
+    this.left.resetEncoder();
+    this.right.resetEncoder();
     m_odometry.resetPosition(pose, Rotation2d.fromDegrees(gyro.getFusedHeading()));
   }
 

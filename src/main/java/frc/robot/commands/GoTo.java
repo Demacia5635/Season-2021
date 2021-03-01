@@ -83,10 +83,11 @@ public class GoTo extends CommandBase {
         double error = Constants.CRUISE_VELOCITY;
         double endPoseLeft = this.startPosLeft + this.distanceLeft + Constants.CRUISE_VELOCITY;
         double endPoseRight = this.startPosRight + this.distanceRight + Constants.CRUISE_VELOCITY;
-        return this.chassis.getLeftPos() <= endPoseLeft + error
-                && this.chassis.getLeftPos() >= endPoseLeft - error
-                && this.chassis.getRightPos() <= endPoseRight + error
-                && this.chassis.getRightPos() >= endPoseRight - error;
+        return 
+        this.chassis.getLeftPos() <= endPoseLeft + error && 
+        this.chassis.getLeftPos() >= endPoseLeft - error && 
+        this.chassis.getRightPos() <= endPoseRight + error && 
+        this.chassis.getRightPos() >= endPoseRight - error &&;
 
     }
 

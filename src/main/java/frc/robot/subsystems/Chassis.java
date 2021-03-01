@@ -27,7 +27,7 @@ import frc.robot.Constants; // import all the measured constants
 import frc.robot.commands.Drive.DriveStates;
 import frc.robot.utils.GroupOfMotors;
 
-public class Chassis extends SubsystemBase implements Sendable {
+public class Chassis extends SubsystemBase {
 
   // TO DO: check the engines direction, maybe invert
   private WPI_TalonSRX rightFront;

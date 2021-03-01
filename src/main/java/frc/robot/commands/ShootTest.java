@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Shooting;
 import frc.robot.subsystems.Chassis;
-import frc.robot.commands.GoForward;
+import frc.robot.commands.GoTo;
 
 public class ShootTest extends CommandBase {
   private Shooting shooting;
@@ -29,10 +29,8 @@ public class ShootTest extends CommandBase {
 
   @Override
   public void execute() {
-    double vel = SmartDashboard.getNumber("Velocity for shooting", 1);
-    double angle = SmartDashboard.getNumber("Angle for shooting", 1);
     if (SmartDashboard.getBoolean("Shoot", false)) {
-      shoot(vel, angle);
+      shoot();
       SmartDashboard.putBoolean("Shoot", false);
     } else if (SmartDashboard.getBoolean("NextPos", false)) {
       nextPos();
@@ -49,11 +47,19 @@ public class ShootTest extends CommandBase {
     return false;
   }
 
-  private void shoot(double vel, double angle) {
-    new Shoot(shooting, vel, angle).withTimeout(10).schedule();
+  private double getVelocity(){
+    return SmartDashboard.getNumber("Velocity for shooting", 1);
+  }
+
+  private double getAngle(){
+    return SmartDashboard.getNumber("Angle for shooting", 1);
+  }
+
+  private void shoot() {
+    new Shoot(shooting, this::getVelocity, this::getAngle).withTimeout(10).schedule();
   }
 
   private void nextPos() {
-    new GoForward(-0.5, chassis);
+    new GoTo(-0.5, chassis);
   }
 }

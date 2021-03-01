@@ -9,9 +9,13 @@ package frc.robot.commands;
 
 import frc.robot.Constants;
 import frc.robot.subsystems.Chassis;
+import frc.robot.subsystems.ExampleSubsystem;
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * An example command that uses an example subsystem.
@@ -20,7 +24,8 @@ public class GoTo extends CommandBase {
     private final Chassis chassis;
     private double startPosLeft;
     private double startPosRight;
-    private double distance;
+    private double distanceLeft;
+    private double distanceRight;
 
     // according to the documentaion:
     // After gain/settings are determined,
@@ -39,7 +44,16 @@ public class GoTo extends CommandBase {
     public GoTo(Chassis chassis, double distance) {
         this.chassis = chassis;
         // Use addRequirements() here to declare subsystem dependencies.
-        this.distance = distance;
+        this.distanceLeft = distance;
+        this.distanceRight = distance;
+        addRequirements(chassis);
+    }
+
+    public GoTo(Chassis chassis, double distanceLeft, double distanceRight) {
+        this.chassis = chassis;
+        // Use addRequirements() here to declare subsystem dependencies.
+        this.distanceLeft = distanceLeft;
+        this.distanceRight = distanceRight;
         addRequirements(chassis);
     }
 
@@ -54,7 +68,8 @@ public class GoTo extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        this.chassis.goTo(this.startPosLeft + this.distance, this.startPosRight + this.distance);
+        this.chassis.goTo(this.startPosLeft + this.distanceLeft,
+                this.startPosRight + this.distanceRight);
     }
 
     // Called once the command ends or is interrupted.
@@ -65,9 +80,14 @@ public class GoTo extends CommandBase {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        double endPoseWithError = this.startPosLeft + distance + Constants.CRUISE_VELOCITY;
-        return this.chassis.getLeftPos() <= endPoseWithError
-                && this.chassis.getLeftPos() >= endPoseWithError;
+        double error = Constants.CRUISE_VELOCITY;
+        double endPoseLeft = this.startPosLeft + this.distanceLeft + Constants.CRUISE_VELOCITY;
+        double endPoseRight = this.startPosRight + this.distanceRight + Constants.CRUISE_VELOCITY;
+        return this.chassis.getLeftPos() <= endPoseLeft + error
+                && this.chassis.getLeftPos() >= endPoseLeft - error
+                && this.chassis.getRightPos() <= endPoseRight + error
+                && this.chassis.getRightPos() >= endPoseRight - error;
+
     }
 
     @Override

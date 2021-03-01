@@ -40,7 +40,7 @@ public class Drive extends CommandBase implements Sendable{
   public Drive(Chassis chassis, InputHandler inputHandler, DriveStates driveState) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.chassis = chassis;
-    controller = new XboxController(Constants.xboxPort);
+    controller = new XboxController(Constants.XBOX_PORT);
     this.inputHandler = inputHandler;
     this.driveState = driveState;
     this.velocity = 0;
@@ -65,8 +65,8 @@ public class Drive extends CommandBase implements Sendable{
         turns = controller.getX(Hand.kRight);
         break;
       case tank:
-        chassis.setVelocity(controller.getY(Hand.kRight) * Constants.maxVelocity,
-            controller.getY(Hand.kLeft) * Constants.maxVelocity);
+        chassis.setVelocity(controller.getY(Hand.kRight) * Constants.MAX_VELOCITY,
+            controller.getY(Hand.kLeft) * Constants.MAX_VELOCITY);
         break;
       case singer:
         velocity = controller.getTriggerAxis(Hand.kRight) - controller.getTriggerAxis(Hand.kLeft);

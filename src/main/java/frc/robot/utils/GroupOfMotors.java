@@ -23,8 +23,8 @@ public class GroupOfMotors {
 
     public GroupOfMotors(int... talons) {
         lead = new WPI_TalonSRX(talons[0]);
-        lead.config_kP(0, Constants.kp);
-        lead.config_kD(0, Constants.kd);
+        lead.config_kP(0, Constants.KP);
+        lead.config_kD(0, Constants.KD);
         lead.setNeutralMode(NeutralMode.Brake);
         lead.enableCurrentLimit(true);
         followers = new TalonSRX[talons.length - 1];
@@ -37,8 +37,8 @@ public class GroupOfMotors {
 
     public GroupOfMotors(WPI_TalonSRX... talons) {
         lead = talons[0];
-        lead.config_kP(0, Constants.kp);
-        lead.config_kD(0, Constants.kd);
+        lead.config_kP(0, Constants.KP);
+        lead.config_kD(0, Constants.KD);
         lead.setNeutralMode(NeutralMode.Brake);
         lead.enableCurrentLimit(true);
         followers = new TalonSRX[talons.length - 1];
@@ -54,11 +54,11 @@ public class GroupOfMotors {
     }
 
     public void setRelVelocity(double vel, SimpleMotorFeedforward aff) { // -1 <= vel <= 1
-        setVelocity(vel * Constants.maxVelocity, aff);
+        setVelocity(vel * Constants.MAX_VELOCITY, aff);
     }
 
     public double getVelocity() {
-        return lead.getSelectedSensorVelocity() / Constants.pulsesPerMeter * 10;
+        return lead.getSelectedSensorVelocity() / Constants.PULSES_PER_METER * 10;
     }
 
     public void resetEncoder() {
@@ -66,14 +66,14 @@ public class GroupOfMotors {
     }
 
     public void setVelocity(double vel, SimpleMotorFeedforward aff) {// M/S
-        double speed = (vel * Constants.pulsesPerMeter / 10.);
+        double speed = (vel * Constants.PULSES_PER_METER / 10.);
         double a = vel - getVelocity();
         double af = aff.calculate(vel, a);
         lead.set(ControlMode.Velocity, speed, DemandType.ArbitraryFeedForward, af);
     }
 
     public void setVelocity(double vel, double aff) {
-        lead.set(ControlMode.Velocity, vel * Constants.pulsesPerMeter / 10.,
+        lead.set(ControlMode.Velocity, vel * Constants.PULSES_PER_METER / 10.,
                 DemandType.ArbitraryFeedForward, aff);
     }
 
@@ -105,7 +105,7 @@ public class GroupOfMotors {
     }
 
     public double getDistance() { // Meters
-        return getEncoder() / Constants.pulsesPerMeter;
+        return getEncoder() / Constants.PULSES_PER_METER;
     }
 
     public void invertEncoder() {

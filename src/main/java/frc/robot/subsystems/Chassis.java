@@ -41,17 +41,17 @@ public class Chassis extends SubsystemBase implements Sendable {
   private DifferentialDrive m_drive; // instance of the premade diffrential drive
   private SpeedControllerGroup leftMotors; // a group which contains both left motors
   private SpeedControllerGroup rightMotors; // a group which contains both right motors
-  private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.ks,
-      Constants.kv, Constants.ka);
+  private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.KS,
+      Constants.KV, Constants.KA);
 
   /**
    * Creates a new Chassis.
    */
   public Chassis(DriveStates dStates) {
-    rightFront = new WPI_TalonSRX(Constants.rightFront);
-    leftFront = new WPI_TalonSRX(Constants.leftFront);
-    rightBack = new WPI_TalonSRX(Constants.rightBack);
-    leftBack = new WPI_TalonSRX(Constants.leftBack);
+    rightFront = new WPI_TalonSRX(Constants.RIGHT_FRONT);
+    leftFront = new WPI_TalonSRX(Constants.LEFT_FRONT);
+    rightBack = new WPI_TalonSRX(Constants.RIGHT_BACK);
+    leftBack = new WPI_TalonSRX(Constants.LEFT_BACK);
 
     rightFront.setInverted(true);
     leftFront.setInverted(true);
@@ -67,7 +67,7 @@ public class Chassis extends SubsystemBase implements Sendable {
     } else {
       this.right = new GroupOfMotors(rightFront, rightBack);
       this.left = new GroupOfMotors(leftFront, leftBack);
-      this.gyro = new PigeonIMU(Constants.gyroPort);
+      this.gyro = new PigeonIMU(Constants.GYRO_PORT);
       this.gyro.setFusedHeading(0);
     }
     m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(gyro.getFusedHeading()));
@@ -118,30 +118,30 @@ public class Chassis extends SubsystemBase implements Sendable {
    * the function sets calculated values for the right and left motors
    */
   public void radialAccelaration(double velocity, double turns) {
-    velocity = velocity * Constants.maxVelocity;
-    turns = turns * Constants.maxRadialAccelaration;
+    velocity = velocity * Constants.MAX_VELOCITY;
+    turns = turns * Constants.MAX_RADIAL_ACCELARATION;
     double right = 0;
     double left = 0;
     if (velocity != 0) {
       if (turns > 0) {
         double radius = (velocity * velocity / turns);
-        right = (velocity / radius) * (radius - (Constants.robotTrackWidth / 2));
-        left = (velocity / radius) * (radius + (Constants.robotTrackWidth / 2));
+        right = (velocity / radius) * (radius - (Constants.ROBOT_TRACK_WIDTH / 2));
+        left = (velocity / radius) * (radius + (Constants.ROBOT_TRACK_WIDTH / 2));
       } else if (turns < 0) {
         double radius = (velocity * velocity / (-turns));
-        right = (velocity / radius) * (radius + (Constants.robotTrackWidth / 2));
-        left = (velocity / radius) * (radius - (Constants.robotTrackWidth / 2));
+        right = (velocity / radius) * (radius + (Constants.ROBOT_TRACK_WIDTH / 2));
+        left = (velocity / radius) * (radius - (Constants.ROBOT_TRACK_WIDTH / 2));
       } else {
         right = velocity;
         left = velocity;
       }
     } else {
       if (turns > 0) {
-        right = -Math.sqrt(turns * (Constants.robotTrackWidth / 2));
-        left = Math.sqrt(turns * (Constants.robotTrackWidth / 2));
+        right = -Math.sqrt(turns * (Constants.ROBOT_TRACK_WIDTH / 2));
+        left = Math.sqrt(turns * (Constants.ROBOT_TRACK_WIDTH / 2));
       } else {
-        right = Math.sqrt((-turns) * (Constants.robotTrackWidth / 2));
-        left = -Math.sqrt((-turns) * (Constants.robotTrackWidth / 2));
+        right = Math.sqrt((-turns) * (Constants.ROBOT_TRACK_WIDTH / 2));
+        left = -Math.sqrt((-turns) * (Constants.ROBOT_TRACK_WIDTH / 2));
       }
     }
     setVelocity(left, right);
@@ -154,19 +154,19 @@ public class Chassis extends SubsystemBase implements Sendable {
    * the function sets calculated values for the right and left motors
    */
   public void angularVelocity(double velocity, double turns) {
-    velocity = velocity * Constants.maxVelocity;
-    turns = turns * Constants.maxAngularVelocity;
+    velocity = velocity * Constants.MAX_VELOCITY;
+    turns = turns * Constants.MAX_ANGULAR_VELOCITY;
     double right = 0;
     double left = 0;
     if (velocity > 0) {
-      right = velocity - turns * (Constants.robotTrackWidth / 2);
-      left = velocity + turns * (Constants.robotTrackWidth / 2);
+      right = velocity - turns * (Constants.ROBOT_TRACK_WIDTH / 2);
+      left = velocity + turns * (Constants.ROBOT_TRACK_WIDTH / 2);
     } else if (velocity < 0) {
-      right = velocity + turns * (Constants.robotTrackWidth / 2);
-      left = velocity - turns * (Constants.robotTrackWidth / 2);
+      right = velocity + turns * (Constants.ROBOT_TRACK_WIDTH / 2);
+      left = velocity - turns * (Constants.ROBOT_TRACK_WIDTH / 2);
     } else {
-      right = -turns * (Constants.robotTrackWidth / 2);
-      left = turns * (Constants.robotTrackWidth / 2);
+      right = -turns * (Constants.ROBOT_TRACK_WIDTH / 2);
+      left = turns * (Constants.ROBOT_TRACK_WIDTH / 2);
     }
     setVelocity(left, right);
   }
@@ -211,23 +211,23 @@ public class Chassis extends SubsystemBase implements Sendable {
   }
 
   public double get_ks() {
-    return Constants.ks;
+    return Constants.KS;
   }
 
   public double get_kv() {
-    return Constants.kv;
+    return Constants.KV;
   }
 
   public double get_kp() {
-    return Constants.kp;
+    return Constants.KP;
   }
 
   public double SpeedInMtoSec1() {
-    return this.getLeftVelocity() * 10 / Constants.pulsesPerMeter;
+    return this.getLeftVelocity() * 10 / Constants.PULSES_PER_METER;
   }
 
   public double SpeedInMtoSec2() {
-    return this.getRightVelocity() * 10 / Constants.pulsesPerMeter;
+    return this.getRightVelocity() * 10 / Constants.PULSES_PER_METER;
   }
 
   /**
@@ -239,10 +239,10 @@ public class Chassis extends SubsystemBase implements Sendable {
     double distance = SmartDashboard.getNumber("VisionDistance", 0);
     double angle = SmartDashboard.getNumber("VisionAngle", 0);
     double radius = distance / (2 * Math.sin(angle * Math.PI / 180));
-    double k = Constants.robotTrackWidth * 100 / 2;
+    double k = Constants.ROBOT_TRACK_WIDTH * 100 / 2;
     double left = speed * (1 + (k / radius));
     double right = speed * (1 - (k / radius));
-    setVelocity(left * Constants.maxVelocity, right * Constants.maxVelocity);
+    setVelocity(left * Constants.MAX_VELOCITY, right * Constants.MAX_VELOCITY);
   }
 
   /**

@@ -40,10 +40,17 @@ public final class Constants {
 
     public static double PULSES_PER_METER = 1675;
 
-    public static final double KP = 0.01;
-    public static final double KI = 0;
-    public static final double KD = 0;
-    public static final double KS = 0.797;
-    public static final double KV = 2.54;
-    public static final double KA = 0.862;
+        // TO DO: SET!!!
+        public static final int MOTION_S_CURVE = 3; // an integer between 0 - 8 that represents the
+        // velocity smoothing
+public static final double ACCELERATION = 10; // the acceletarion in sensor units per 100 ms
+public static final double CRUISE_VELOCITY = 5 * PULSES_PER_METER / 10; // the peak speed in sensor
+                                   // units per 100 ms
+
+    public static final double CHASSIS_KP = 0.01;
+    public static final double CHASSIS_KI = 0;
+    public static final double CHASSIS_KD = 0;
+    public static final double CHASSIS_KS = 0.797;
+    public static final double CHASSIS_KV = 2.54;
+    public static final double CHASSIS_KA = 0.862;
 }

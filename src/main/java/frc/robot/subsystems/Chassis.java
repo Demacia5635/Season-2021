@@ -10,7 +10,6 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX; // import the tlaonFX
 import com.ctre.phoenix.sensors.PigeonIMU;
 
-import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SpeedControllerGroup; // import the speed control group type
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive; // import the diffrential drive
@@ -41,8 +40,8 @@ public class Chassis extends SubsystemBase {
   private DifferentialDrive m_drive; // instance of the premade diffrential drive
   private SpeedControllerGroup leftMotors; // a group which contains both left motors
   private SpeedControllerGroup rightMotors; // a group which contains both right motors
-  private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.KS,
-      Constants.KV, Constants.KA);
+  private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(
+      Constants.CHASSIS_KS, Constants.CHASSIS_KV, Constants.CHASSIS_KA);
 
   /**
    * Creates a new Chassis.
@@ -211,15 +210,15 @@ public class Chassis extends SubsystemBase {
   }
 
   public double get_ks() {
-    return Constants.KS;
+    return Constants.CHASSIS_KS;
   }
 
   public double get_kv() {
-    return Constants.KV;
+    return Constants.CHASSIS_KV;
   }
 
   public double get_kp() {
-    return Constants.KP;
+    return Constants.CHASSIS_KP;
   }
 
   public double SpeedInMtoSec1() {
@@ -261,6 +260,72 @@ public class Chassis extends SubsystemBase {
     }, () -> {
       return SmartDashboard.getNumber("VisionDistance", 0) == 0;
     });
+  }
+
+  public void setPos(double pos1, double pos2) {
+    this.left.setMotionMagic(pos1, this.feedforward, Constants.CRUISE_VELOCITY,
+        Constants.ACCELERATION);
+    this.right.setMotionMagic(pos1, this.feedforward, Constants.CRUISE_VELOCITY,
+        Constants.ACCELERATION);
+  }
+
+  public void setPos2(double pos1, double pos2) {
+    this.left.setMotionMagic(pos1);
+    this.right.setMotionMagic(pos1);
+  }
+
+  public void goTo(double distanceLeft, double distanceRight) {
+    // this.configMotionMagic();
+    this.setPos2(this.left.getEncoder() + distanceLeft, this.right.getEncoder() + distanceRight);
+  }
+
+  public void goTo(double distance) {
+    // this.configMotionMagic();
+    this.setPos2(this.left.getEncoder() + distance, this.right.getEncoder() + distance);
+  }
+
+  public void configMotionMagic() {
+    this.left.setMotionSCurve(Constants.MOTION_S_CURVE);
+    this.left.setCruiseVelocity(Constants.CRUISE_VELOCITY);
+    this.left.setAcceleration(Constants.ACCELERATION);
+    this.right.setMotionSCurve(Constants.MOTION_S_CURVE);
+    this.right.setCruiseVelocity(Constants.CRUISE_VELOCITY);
+    this.right.setAcceleration(Constants.ACCELERATION);
+  }
+
+  public void configMotionMagic(double accelaration) {
+    this.left.setMotionSCurve(Constants.MOTION_S_CURVE);
+    this.left.setCruiseVelocity(Constants.CRUISE_VELOCITY);
+    this.left.setAcceleration(accelaration);
+    this.right.setMotionSCurve(Constants.MOTION_S_CURVE);
+    this.right.setCruiseVelocity(Constants.CRUISE_VELOCITY);
+    this.right.setAcceleration(accelaration);
+  }
+
+  public void configMotionMagic(int curve) {
+    this.left.setMotionSCurve(curve);
+    this.left.setCruiseVelocity(Constants.CRUISE_VELOCITY);
+    this.left.setAcceleration(Constants.ACCELERATION);
+    this.right.setMotionSCurve(curve);
+    this.right.setCruiseVelocity(Constants.CRUISE_VELOCITY);
+    this.right.setAcceleration(Constants.ACCELERATION);
+  }
+
+  public void configMotionMagic(double accelaration, int curve) {
+    this.left.setMotionSCurve(curve);
+    this.left.setCruiseVelocity(Constants.CRUISE_VELOCITY);
+    this.left.setAcceleration(accelaration);
+    this.right.setMotionSCurve(curve);
+    this.right.setCruiseVelocity(Constants.CRUISE_VELOCITY);
+    this.right.setAcceleration(accelaration);
+  }
+
+  public double getPosLeft() {
+    return this.left.getEncoder();
+  }
+
+  public double getPoseRight() {
+    return this.right.getEncoder();
   }
 
   @Override

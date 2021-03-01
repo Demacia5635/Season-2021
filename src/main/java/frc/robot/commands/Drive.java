@@ -7,7 +7,6 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -15,9 +14,8 @@ import frc.robot.Constants;
 import frc.robot.subsystems.Chassis;
 // some debugging power
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Drive extends CommandBase implements Sendable{
+public class Drive extends CommandBase {
 
   public enum InputHandler {
     tank, singer, triggerTurns, YandX

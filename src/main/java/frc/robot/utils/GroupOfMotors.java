@@ -21,12 +21,21 @@ public class GroupOfMotors {
     private TalonSRX lead;
     private TalonSRX[] followers;
 
+    /**
+     * Recieves a group of talon device numbers. Creats an instance of WPI_TalonSRX
+     * talons for each device number.
+     * sets the first to be the leader and the rest to follow it.
+     * also configs the characteristics to those in the constants and sets them to
+     * brake mode.
+     * 
+     * @param talons - a group of device numbers for WPI_TalonSRX talons
+     */
     public GroupOfMotors(int... talons) {
-        lead = new WPI_TalonSRX(talons[0]);
-        lead.config_kP(0, Constants.KP);
-        lead.config_kD(0, Constants.KD);
-        lead.setNeutralMode(NeutralMode.Brake);
-        lead.enableCurrentLimit(true);
+        this.lead = new WPI_TalonSRX(talons[0]);
+        this.lead.config_kP(0, Constants.CHASSIS_KP);
+        this.lead.config_kD(0, Constants.CHASSIS_KD);
+        this.lead.setNeutralMode(NeutralMode.Brake);
+        this.lead.enableCurrentLimit(true);
         followers = new TalonSRX[talons.length - 1];
         for (int i = 0; i < followers.length; i++) {
             followers[i] = new WPI_TalonSRX(talons[i + 1]);
@@ -35,12 +44,20 @@ public class GroupOfMotors {
         }
     }
 
+    /**
+     * Recieves a group of talons. sets the first to be the leader and the rest to
+     * follow it.
+     * also configs the characteristics to those in the constants and sets them to
+     * brake mode.
+     * 
+     * @param talons - a group of WPI_TalonSRX talons
+     */
     public GroupOfMotors(WPI_TalonSRX... talons) {
-        lead = talons[0];
-        lead.config_kP(0, Constants.KP);
-        lead.config_kD(0, Constants.KD);
-        lead.setNeutralMode(NeutralMode.Brake);
-        lead.enableCurrentLimit(true);
+        this.lead = talons[0];
+        this.lead.config_kP(0, Constants.CHASSIS_KP);
+        this.lead.config_kD(0, Constants.CHASSIS_KD);
+        this.lead.setNeutralMode(NeutralMode.Brake);
+        this.lead.enableCurrentLimit(true);
         followers = new TalonSRX[talons.length - 1];
         for (int i = 0; i < followers.length; i++) {
             followers[i] = talons[i + 1];
@@ -58,11 +75,11 @@ public class GroupOfMotors {
     }
 
     public double getVelocity() {
-        return lead.getSelectedSensorVelocity() / Constants.PULSES_PER_METER * 10;
+        return this.lead.getSelectedSensorVelocity() / Constants.PULSES_PER_METER * 10;
     }
 
     public void resetEncoder() {
-        lead.setSelectedSensorPosition(0);
+        this.lead.setSelectedSensorPosition(0);
     }
 
     public void setVelocity(double vel, SimpleMotorFeedforward aff) {// M/S
@@ -73,8 +90,21 @@ public class GroupOfMotors {
     }
 
     public void setVelocity(double vel, double aff) {
-        lead.set(ControlMode.Velocity, vel * Constants.PULSES_PER_METER / 10.,
+        this.lead.set(ControlMode.Velocity, vel * Constants.PULSES_PER_METER / 10.,
                 DemandType.ArbitraryFeedForward, aff);
+    }
+
+    public void setMotionMagic(double pos, SimpleMotorFeedforward aff, double maxSpeed,
+            double acceleration) {
+        // this.lead.set(ControlMode.MotionMagic, pos, DemandType.ArbitraryFeedForward,
+        // aff.calculate(maxSpeed, acceleration));
+        this.lead.set(ControlMode.MotionMagic, pos, DemandType.Neutral,
+                aff.calculate(maxSpeed, acceleration));
+    }
+
+    public void setMotionMagic(double pos) {
+        // this.lead.set(ControlMode.MotionMagic, pos, DemandType.Neutral, 0);
+        this.lead.set(ControlMode.MotionMagic, pos);
     }
 
     public double getAccelForSpeed(double vel) {
@@ -82,33 +112,73 @@ public class GroupOfMotors {
     }
 
     public void setK_P(double k_p) {
-        lead.config_kP(0, k_p);
+        this.lead.config_kP(0, k_p);
     }
 
     public void setK_I(double k_i) {
-        lead.config_kI(0, k_i);
+        this.lead.config_kI(0, k_i);
     }
 
     public void setK_D(double k_d) {
-        lead.config_kD(0, k_d);
+        this.lead.config_kD(0, k_d);
     }
 
     public void invertMotors() {
-        lead.setInverted(true);
+        this.lead.setInverted(true);
         for (TalonSRX talon : followers) {
             talon.setInverted(InvertType.FollowMaster);
         }
     }
 
+    /**
+     * 
+     * @return the encoder pulse count
+     */
     public double getEncoder() { // Pulses
-        return lead.getSelectedSensorPosition();
+        return this.lead.getSelectedSensorPosition();
     }
 
+    /**
+     * 
+     * @return the encoder count translated to meters
+     */
     public double getDistance() { // Meters
-        return getEncoder() / Constants.PULSES_PER_METER;
+        return this.getEncoder() / Constants.PULSES_PER_METER;
     }
 
     public void invertEncoder() {
-        lead.setSensorPhase(true);
+        this.lead.setSensorPhase(true);
+    }
+
+    /**
+     * If the S-Curve strength [0,8] is set to a nonzero value,
+     * the generated velocity profile is no longer trapezoidal,
+     * but instead is continuous (corner points are smoothed).
+     * The S-Curve feature, by its nature, will increase the amount of time a
+     * movement requires.
+     * This can be compensated for by decreasing the configured acceleration value.
+     * 
+     * @param curveStrength - the S-Curve strength between 0-8
+     */
+    public void setMotionSCurve(int curveStrength) {
+        this.lead.configMotionSCurveStrength(curveStrength);
+    }
+
+    /**
+     * configs the talon's cruise (peak) velocity
+     * 
+     * @param cruiseVelocity - in sensor units per 100ms
+     */
+    public void setCruiseVelocity(double cruiseVelocity) {
+        this.lead.configMotionCruiseVelocity(cruiseVelocity);
+    }
+
+    /**
+     * configs the motion acceleration
+     * 
+     * @param motionAcceleration - in sensor units per 100ms
+     */
+    public void setAcceleration(double motionAcceleration) {
+        this.lead.configMotionAcceleration(motionAcceleration);
     }
 }

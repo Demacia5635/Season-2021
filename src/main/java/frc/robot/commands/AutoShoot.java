@@ -4,7 +4,6 @@
 
 package frc.robot.commands;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -123,7 +122,7 @@ public class AutoShoot extends CommandBase {
         } else if (firstTime && str.contains(":")) firstTime = false;
       }
       scanner.close();
-    } catch (IOException e) {
+    } catch (Exception e) {
       System.out.println("Couldn't access file");
     }
   }

@@ -33,7 +33,7 @@ public final class Constants {
 
     public static int xboxPort = 0;
 
-    public static double robotLength = 0.575;//meters
+    public static final double robotTrackWidth = 0.575; // In meters
     public static double maxVelocity = 2;//meters per second
     public static double maxRadialAccelaration = 4;//meters per squared second
     public static double maxAngularVelocity = Math.PI;//radians per second

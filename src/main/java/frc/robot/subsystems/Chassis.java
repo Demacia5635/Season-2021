@@ -20,6 +20,8 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 // some debugging power
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase; // import the base subsystem (which we extend)
 import frc.robot.Constants; // import all the measured constants
 import frc.robot.commands.Drive.DriveStates;
@@ -30,7 +32,7 @@ public class Chassis extends SubsystemBase implements Sendable {
   // TO DO: check the engines direction, maybe invert
   private WPI_TalonSRX rightFront;
   private WPI_TalonSRX leftFront;
-  private WPI_TalonSRX rightBack; 
+  private WPI_TalonSRX rightBack;
   private WPI_TalonSRX leftBack;
   private final DifferentialDriveOdometry m_odometry;
   private GroupOfMotors right;
@@ -109,12 +111,12 @@ public class Chassis extends SubsystemBase implements Sendable {
     return left.getVelocity();
   }
 
-  /** 
-  gets 2 values between 1 to -1 one to determine the tangent velocity 
-  and the other determines the radial accelaration of the robot
-
-  the function sets calculated values for the right and left motors
-  */
+  /**
+   * gets 2 values between 1 to -1 one to determine the tangent velocity
+   * and the other determines the radial accelaration of the robot
+   * 
+   * the function sets calculated values for the right and left motors
+   */
   public void radialAccelaration(double velocity, double turns) {
     velocity = velocity * Constants.maxVelocity;
     turns = turns * Constants.maxRadialAccelaration;
@@ -122,55 +124,49 @@ public class Chassis extends SubsystemBase implements Sendable {
     double left = 0;
     if (velocity != 0) {
       if (turns > 0) {
-        double radius = (velocity * velocity/turns);
-        right = (velocity/radius)*(radius-(Constants.robotLength/2));
-        left = (velocity/radius)*(radius+(Constants.robotLength/2));
-      } 
-      else if (turns < 0) {
-        double radius = (velocity * velocity/(-turns));
-        right = (velocity/radius)*(radius+(Constants.robotLength/2));
-        left = (velocity/radius)*(radius-(Constants.robotLength/2));
-      } 
-      else {
+        double radius = (velocity * velocity / turns);
+        right = (velocity / radius) * (radius - (Constants.robotTrackWidth / 2));
+        left = (velocity / radius) * (radius + (Constants.robotTrackWidth / 2));
+      } else if (turns < 0) {
+        double radius = (velocity * velocity / (-turns));
+        right = (velocity / radius) * (radius + (Constants.robotTrackWidth / 2));
+        left = (velocity / radius) * (radius - (Constants.robotTrackWidth / 2));
+      } else {
         right = velocity;
         left = velocity;
       }
-    } 
-    else {
+    } else {
       if (turns > 0) {
-        right = -Math.sqrt(turns * (Constants.robotLength / 2));
-        left = Math.sqrt(turns * (Constants.robotLength / 2));
-      } 
-      else {
-        right = Math.sqrt((-turns) * (Constants.robotLength / 2));
-        left = -Math.sqrt((-turns) * (Constants.robotLength / 2));
+        right = -Math.sqrt(turns * (Constants.robotTrackWidth / 2));
+        left = Math.sqrt(turns * (Constants.robotTrackWidth / 2));
+      } else {
+        right = Math.sqrt((-turns) * (Constants.robotTrackWidth / 2));
+        left = -Math.sqrt((-turns) * (Constants.robotTrackWidth / 2));
       }
     }
     setVelocity(left, right);
   }
 
-  /** 
-  gets 2 values between 1 to -1 one to determine the tangent velocity 
-  and the other determines the angular velocity of the robot
-   
-  the function sets calculated values for the right and left motors
-  */
+  /**
+   * gets 2 values between 1 to -1 one to determine the tangent velocity
+   * and the other determines the angular velocity of the robot
+   * 
+   * the function sets calculated values for the right and left motors
+   */
   public void angularVelocity(double velocity, double turns) {
     velocity = velocity * Constants.maxVelocity;
     turns = turns * Constants.maxAngularVelocity;
     double right = 0;
     double left = 0;
     if (velocity > 0) {
-      right = velocity - turns * (Constants.robotLength / 2);
-      left = velocity + turns * (Constants.robotLength / 2);
-    } 
-    else if (velocity < 0) {
-      right = velocity + turns * (Constants.robotLength / 2);
-      left = velocity - turns * (Constants.robotLength / 2);
-    } 
-    else {
-      right = -turns * (Constants.robotLength / 2);
-      left = turns * (Constants.robotLength / 2);
+      right = velocity - turns * (Constants.robotTrackWidth / 2);
+      left = velocity + turns * (Constants.robotTrackWidth / 2);
+    } else if (velocity < 0) {
+      right = velocity + turns * (Constants.robotTrackWidth / 2);
+      left = velocity - turns * (Constants.robotTrackWidth / 2);
+    } else {
+      right = -turns * (Constants.robotTrackWidth / 2);
+      left = turns * (Constants.robotTrackWidth / 2);
     }
     setVelocity(left, right);
   }
@@ -194,19 +190,6 @@ public class Chassis extends SubsystemBase implements Sendable {
     this.m_drive.curvatureDrive(xSpeed, zRotation, isQuickTurn);
   }
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-  }
-
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    // builder.addDoubleProperty(key, getter, setter);
-    builder.addDoubleProperty("Left Speed", this::getLeftVelocity, null);
-    builder.addDoubleProperty("Right Speed", this::getRightVelocity, null);
-    builder.addDoubleProperty("Angle", this::getAngle, null);
-  }
-
   /**
    * Returns the currently-estimated pose of the robot.
    *
@@ -218,9 +201,9 @@ public class Chassis extends SubsystemBase implements Sendable {
 
   /**
    * Resets the odometry to the specified pose.
-  *
-  * @param pose The pose to which to set the odometry.
-  */
+   *
+   * @param pose The pose to which to set the odometry.
+   */
   public void resetOdometry(Pose2d pose) {
     leftFront.setSelectedSensorPosition(0);
     rightFront.setSelectedSensorPosition(0);
@@ -245,5 +228,51 @@ public class Chassis extends SubsystemBase implements Sendable {
 
   public double SpeedInMtoSec2() {
     return this.getRightVelocity() * 10 / Constants.pulsesPerMeter;
+  }
+
+  /**
+   * Drives to the ball on an arc
+   * 
+   * @param speed - The velocity at which the robot will drive in Meters
+   */
+  public void driveToBall(double speed) {
+    double distance = SmartDashboard.getNumber("VisionDistance", 0);
+    double angle = SmartDashboard.getNumber("VisionAngle", 0);
+    double radius = distance / (2 * Math.sin(angle * Math.PI / 180));
+    double k = Constants.robotTrackWidth * 100 / 2;
+    double left = speed * (1 + (k / radius));
+    double right = speed * (1 - (k / radius));
+    setVelocity(left * Constants.maxVelocity, right * Constants.maxVelocity);
+  }
+
+  /**
+   * 
+   * @param speed - The velocity at which the robot will drive in Meters
+   * 
+   * @return A command that will execute the driveToBall function pereiodecly
+   *         untill reacing the ball
+   */
+  public CommandBase driveToBallCommand(double speed) {
+    return new FunctionalCommand(() -> {
+    }, () -> {
+      driveToBall(speed);
+    }, (interrupted) -> {
+      setVelocity(0, 0);
+    }, () -> {
+      return SmartDashboard.getNumber("VisionDistance", 0) == 0;
+    });
+  }
+
+  @Override
+  public void periodic() {
+    // This method will be called once per scheduler run
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    // builder.addDoubleProperty(key, getter, setter);
+    builder.addDoubleProperty("Left Speed", this::getLeftVelocity, null);
+    builder.addDoubleProperty("Right Speed", this::getRightVelocity, null);
+    builder.addDoubleProperty("Angle", this::getAngle, null);
   }
 }

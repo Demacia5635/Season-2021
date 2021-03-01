@@ -7,15 +7,38 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Roulette extends SubsystemBase {
+
+  private WPI_TalonSRX roulette;
+
   public Roulette() {
-    
+    roulette = new WPI_TalonSRX(Constants.ROULETTE_MOTOR_PORT);
+  }
+
+  public void startSpin() {
+    roulette.set(ControlMode.PercentOutput, 1);
+  }
+
+  public void stopSpin() {
+    roulette.set(ControlMode.PercentOutput, 0);
+  }
+
+  /**
+   * @return A StartEndCommand that starts the roulette's spin
+   */
+  public StartEndCommand getSpinCommand() {
+    return new StartEndCommand(this::startSpin, this::stopSpin, this);
   }
 
   @Override
   public void periodic() {
-    
+
   }
 }

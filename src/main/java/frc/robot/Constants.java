@@ -34,7 +34,7 @@ public final class Constants {
     public static int XBOX_PORT = 0;
 
     public static final double ROBOT_TRACK_WIDTH = 0.575; // In meters
-    public static double MAX_VELOCITY = 2; // In meters per second
+    public static double MAX_VELOCITY = 4; // In meters per second
     public static double MAX_RADIAL_ACCELARATION = 4; // In meters per squared second
     public static double MAX_ANGULAR_VELOCITY = Math.PI; // In radians per second
 

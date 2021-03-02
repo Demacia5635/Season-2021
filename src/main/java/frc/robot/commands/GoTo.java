@@ -87,7 +87,7 @@ public class GoTo extends CommandBase {
         this.chassis.getLeftPos() <= endPoseLeft + error && 
         this.chassis.getLeftPos() >= endPoseLeft - error && 
         this.chassis.getRightPos() <= endPoseRight + error && 
-        this.chassis.getRightPos() >= endPoseRight - error &&;
+        this.chassis.getRightPos() >= endPoseRight - error;
 
     }
 

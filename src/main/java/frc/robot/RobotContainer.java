@@ -11,6 +11,7 @@ import com.ctre.phoenix.sensors.PigeonIMU;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.Drive;
 import frc.robot.commands.Drive.DriveStates;
 import frc.robot.commands.Drive.InputHandler;
@@ -45,6 +46,11 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    SmartDashboard.putData(chassis);
+    SmartDashboard.putData(climb);
+    SmartDashboard.putData(pickup);
+    SmartDashboard.putData(roulette);
+    SmartDashboard.putData(shooting);
     // Configure the button bindings
     configureButtonBindings();
   }

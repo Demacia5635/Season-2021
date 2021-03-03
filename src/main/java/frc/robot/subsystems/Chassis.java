@@ -7,7 +7,7 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX; // import the tlaonFX
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX; // import the tlaonFX
 import com.ctre.phoenix.sensors.PigeonIMU;
 
 import edu.wpi.first.wpilibj.SpeedControllerGroup; // import the speed control group type
@@ -39,34 +39,35 @@ public class Chassis extends SubsystemBase {
   private SpeedControllerGroup rightMotors; // a group which contains both right motors
   private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(
       Constants.CHASSIS_KS, Constants.CHASSIS_KV, Constants.CHASSIS_KA);
+  private DriveStates state;
 
   /**
    * Creates a new Chassis.
    */
   public Chassis(DriveStates dStates) {
-    WPI_TalonSRX rightFront = new WPI_TalonSRX(Constants.RIGHT_FRONT);
-    WPI_TalonSRX leftFront = new WPI_TalonSRX(Constants.LEFT_FRONT);
-    WPI_TalonSRX rightBack = new WPI_TalonSRX(Constants.RIGHT_BACK);
-    WPI_TalonSRX leftBack = new WPI_TalonSRX(Constants.LEFT_BACK);
+    state = dStates;
 
-    rightFront.setInverted(true);
+    WPI_TalonFX rightFront = new WPI_TalonFX(Constants.RIGHT_FRONT);
+    WPI_TalonFX leftFront = new WPI_TalonFX(Constants.LEFT_FRONT);
+    WPI_TalonFX rightBack = new WPI_TalonFX(Constants.RIGHT_BACK);
+    WPI_TalonFX leftBack = new WPI_TalonFX(Constants.LEFT_BACK);
+
     leftFront.setInverted(true);
-    rightBack.setInverted(true);
     leftBack.setInverted(true);
 
     if (dStates == DriveStates.arcadeDrive || dStates == DriveStates.curvatureDrive) {
       this.leftMotors = new SpeedControllerGroup(leftFront, leftBack);
-      this.rightMotors = new SpeedControllerGroup(rightBack, rightBack);
+      this.rightMotors = new SpeedControllerGroup(rightFront, rightBack);
       this.m_drive = new DifferentialDrive(this.leftMotors, this.rightMotors);
-      this.m_drive.setMaxOutput(0.5);
-      m_drive.setRightSideInverted(false);
+      leftMotors.setInverted(true);
     } else {
       this.right = new GroupOfMotors(rightFront, rightBack);
       this.left = new GroupOfMotors(leftFront, leftBack);
       this.gyro = RobotContainer.gyro;
-
+      left.resetEncoder();
+      right.resetEncoder();
     }
-    m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(gyro.getFusedHeading()));
+    m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getFusedHeading()));
   }
 
   public void setVelocity(double left, double right) {
@@ -77,12 +78,17 @@ public class Chassis extends SubsystemBase {
   public double getFusedHeading(){
     if (gyro != null){
       return gyro.getFusedHeading();
+    } else {
+      gyro = RobotContainer.gyro;
+      if (gyro != null){
+        return gyro.getFusedHeading();
+      }
     }
     return 0;
   }
 
   public double getAngle() {
-    double angle = gyro.getFusedHeading();
+    double angle = getFusedHeading();
 
     if (angle < 0) {
       angle = -((-angle) % 360.0);
@@ -179,7 +185,6 @@ public class Chassis extends SubsystemBase {
     // zRotation - The robot's rotation rate around the Z axis [-1.0..1.0].
     // Clockwise is positive.
     // squareInputs - If set, decreases the input sensitivity at low speeds.
-
     this.m_drive.arcadeDrive(xSpeed, zRotation, squareInputs);
   }
 
@@ -340,8 +345,12 @@ public class Chassis extends SubsystemBase {
   @Override
   public void initSendable(SendableBuilder builder) {
     // builder.addDoubleProperty(key, getter, setter);
-    builder.addDoubleProperty("Left Speed", this::getLeftVelocity, null);
-    builder.addDoubleProperty("Right Speed", this::getRightVelocity, null);
+    if (state == DriveStates.angularVelocity || state == DriveStates.radialAccelaration) {
+      builder.addDoubleProperty("Left Distance", this::getLeftPos, null);
+      builder.addDoubleProperty("Right Distance", this::getRightPos, null);
+      builder.addDoubleProperty("Left Speed", this::getLeftVelocity, null);
+      builder.addDoubleProperty("Right Speed", this::getRightVelocity, null);
+    }
     builder.addDoubleProperty("Angle", this::getAngle, null);
   }
 }

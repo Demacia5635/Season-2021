@@ -47,7 +47,7 @@ public final class Constants {
     public static final double MAX_RADIAL_ACCELARATION = 4; // In meters per squared second
     public static final double MAX_ANGULAR_VELOCITY = Math.PI; // In radians per second
 
-    public static final double PULSES_PER_METER = 1675;
+    public static final double PULSES_PER_METER = 44700;
 
         // TO DO: SET!!!
         public static final int MOTION_S_CURVE = 3; // an integer between 0 - 8 that represents the

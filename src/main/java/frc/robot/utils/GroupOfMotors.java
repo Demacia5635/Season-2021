@@ -11,35 +11,33 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import frc.robot.Constants;
 
 public class GroupOfMotors {
-    private TalonSRX lead;
-    private TalonSRX[] followers;
+    private WPI_TalonFX lead;
+    private WPI_TalonFX[] followers;
 
     /**
-     * Recieves a group of talon device numbers. Creats an instance of WPI_TalonSRX
+     * Recieves a group of talon device numbers. Creats an instance of WPI_TalonFX
      * talons for each device number.
      * sets the first to be the leader and the rest to follow it.
      * also configs the characteristics to those in the constants and sets them to
      * brake mode.
      * 
-     * @param talons - a group of device numbers for WPI_TalonSRX talons
+     * @param talons - a group of device numbers for WPI_TalonFX talons
      */
     public GroupOfMotors(int... talons) {
-        this.lead = new WPI_TalonSRX(talons[0]);
+        this.lead = new WPI_TalonFX(talons[0]);
         this.lead.config_kP(0, Constants.CHASSIS_KP);
         this.lead.config_kD(0, Constants.CHASSIS_KD);
-        this.lead.setNeutralMode(NeutralMode.Brake);
-        this.lead.enableCurrentLimit(true);
-        followers = new TalonSRX[talons.length - 1];
+        this.lead.setNeutralMode(NeutralMode.Coast);
+        followers = new WPI_TalonFX[talons.length - 1];
         for (int i = 0; i < followers.length; i++) {
-            followers[i] = new WPI_TalonSRX(talons[i + 1]);
-            followers[i].setNeutralMode(NeutralMode.Brake);
+            followers[i] = new WPI_TalonFX(talons[i + 1]);
+            followers[i].setNeutralMode(NeutralMode.Coast);
             followers[i].follow(lead);
         }
     }
@@ -50,18 +48,17 @@ public class GroupOfMotors {
      * also configs the characteristics to those in the constants and sets them to
      * brake mode.
      * 
-     * @param talons - a group of WPI_TalonSRX talons
+     * @param talons - a group of WPI_TalonFX talons
      */
-    public GroupOfMotors(WPI_TalonSRX... talons) {
+    public GroupOfMotors(WPI_TalonFX... talons) {
         this.lead = talons[0];
         this.lead.config_kP(0, Constants.CHASSIS_KP);
         this.lead.config_kD(0, Constants.CHASSIS_KD);
-        this.lead.setNeutralMode(NeutralMode.Brake);
-        this.lead.enableCurrentLimit(true);
-        followers = new TalonSRX[talons.length - 1];
+        this.lead.setNeutralMode(NeutralMode.Coast);
+        followers = new WPI_TalonFX[talons.length - 1];
         for (int i = 0; i < followers.length; i++) {
             followers[i] = talons[i + 1];
-            followers[i].setNeutralMode(NeutralMode.Brake);
+            followers[i].setNeutralMode(NeutralMode.Coast);
             followers[i].follow(lead);
         }
     }
@@ -75,11 +72,11 @@ public class GroupOfMotors {
     }
 
     public double getVelocity() {
-        return this.lead.getSelectedSensorVelocity() / Constants.PULSES_PER_METER * 10;
+        return lead.getSelectedSensorVelocity() / Constants.PULSES_PER_METER * 10;
     }
 
     public void resetEncoder() {
-        this.lead.setSelectedSensorPosition(0);
+        lead.setSelectedSensorPosition(0);
     }
 
     public void setVelocity(double vel, SimpleMotorFeedforward aff) {// M/S
@@ -90,7 +87,7 @@ public class GroupOfMotors {
     }
 
     public void setVelocity(double vel, double aff) {
-        this.lead.set(ControlMode.Velocity, vel * Constants.PULSES_PER_METER / 10.,
+        lead.set(ControlMode.Velocity, vel * Constants.PULSES_PER_METER / 10.,
                 DemandType.ArbitraryFeedForward, aff);
     }
 
@@ -125,7 +122,7 @@ public class GroupOfMotors {
 
     public void invertMotors() {
         this.lead.setInverted(true);
-        for (TalonSRX talon : followers) {
+        for (WPI_TalonFX talon : followers) {
             talon.setInverted(InvertType.FollowMaster);
         }
     }

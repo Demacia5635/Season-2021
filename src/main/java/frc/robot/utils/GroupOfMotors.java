@@ -82,7 +82,7 @@ public class GroupOfMotors {
     public void setVelocity(double vel, SimpleMotorFeedforward aff) {// M/S
         double speed = (vel * Constants.PULSES_PER_METER / 10.);
         double a = vel - getVelocity();
-        double af = aff.calculate(vel, a);
+        double af = aff.calculate(vel, a) / 12;
         lead.set(ControlMode.Velocity, speed, DemandType.ArbitraryFeedForward, af);
     }
 

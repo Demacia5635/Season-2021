@@ -62,11 +62,11 @@ public class RobotContainer {
   }
 
   /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
+   * Gets the path following command needed for the path following
+   * 
+   * @return The path following command
    */
-  public Command[] getAutonomousCommands() {
+  private Command getPathFollowingCommand() {
     final String trajectoryJSON = "paths/output/Test.wpilib.json";
     Trajectory trajectory = new Trajectory();
 
@@ -83,7 +83,16 @@ public class RobotContainer {
 
     chassis.resetOdometry(trajectory.getInitialPose());
 
-    return new Command[] { cmd.andThen(() -> chassis.setVelocity(0, 0)) };
+    return cmd.andThen(() -> chassis.setVelocity(0, 0));
+  }
+
+  /**
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   *
+   * @return the command to run in autonomous
+   */
+  public Command[] getAutonomousCommands() {
+    return new Command[] { getPathFollowingCommand() };
   }
 
   public Command[] getTeleopCommands() {

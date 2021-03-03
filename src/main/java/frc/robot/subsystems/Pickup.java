@@ -9,22 +9,29 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.sensors.PigeonIMU;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 
 public class Pickup extends SubsystemBase {
 
   private WPI_TalonSRX pickupMotor;
   private WPI_TalonSRX armMotor;
+  private PigeonIMU gyro;
+
 
   public Pickup() {
     pickupMotor = new WPI_TalonSRX(Constants.PICKUP_MOTOR_PORT);
     armMotor = new WPI_TalonSRX(Constants.ARM_MOTOR_PORT);
     armMotor.config_kP(0, Constants.ARM_KP);
     armMotor.configSelectedFeedbackCoefficient(360. / 800.);
+    gyro = new PigeonIMU(pickupMotor);
+    gyro.setFusedHeading(0);
+    RobotContainer.gyro = gyro;
   }
 
   /**

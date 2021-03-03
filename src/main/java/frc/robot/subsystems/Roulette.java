@@ -23,7 +23,7 @@ public class Roulette extends SubsystemBase {
   }
 
   public void startSpin() {
-    roulette.set(ControlMode.PercentOutput, 1);
+    roulette.set(ControlMode.PercentOutput, 0.1);
   }
 
   public void stopSpin() {

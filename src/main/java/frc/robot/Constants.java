@@ -21,15 +21,14 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    public static final int SHOOTER_WHEEL_PORT = -1;
-    public static final int HOOD_MOTOR_PORT = -1;
-    public static final int BONKER_PORT = -1;
-    public static final int VACUUM_MOTOR_PORT = -1;
-    public static final int MAX_LIM_PORT = -1;
-    public static final int MIN_LIM_PORT = -1;
-    public static final int ROULETTE_MOTOR_PORT = -1;
-    public static final int ARM_MOTOR_PORT = -1;
-    public static final int PICKUP_MOTOR_PORT = -1;
+    public static final int SHOOTER_WHEEL_PORT = 10;
+    public static final int HOOD_MOTOR_PORT = 8;
+    public static final int BONKER_PORT = 7;
+    public static final int VACUUM_MOTOR_PORT = 9;
+    public static final int LIM_PORT = 0;
+    public static final int ROULETTE_MOTOR_PORT = 11;
+    public static final int ARM_MOTOR_PORT = 5;
+    public static final int PICKUP_MOTOR_PORT = 6;
 
     public static final int SHOOTER_KS = -1;
     public static final int HOOD_KP = -1;
@@ -39,7 +38,7 @@ public final class Constants {
     public static final int RIGHT_BACK = 2;
     public static final int LEFT_FRONT = 3;
     public static final int LEFT_BACK = 4;
-    public static final int GYRO_PORT = 0;
+    public static final int GYRO_PORT = 6;
 
     public static final int XBOX_PORT = 0;
 

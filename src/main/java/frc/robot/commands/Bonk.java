@@ -10,6 +10,7 @@ import frc.robot.subsystems.Shooting;
 public class Bonk extends CommandBase {
   private Shooting shooting;
   private boolean up;
+  private int count;
 
   public Bonk(Shooting shooting, boolean up) {
     addRequirements(shooting);
@@ -19,7 +20,13 @@ public class Bonk extends CommandBase {
 
   @Override
   public void initialize() {
-    shooting.setBonk(up ? 1 : -1);
+    shooting.setBonk(up ? 0.01 : -0.01);
+    count = 0;
+  }
+
+  @Override
+  public void execute() {
+    count++;
   }
 
   @Override
@@ -29,6 +36,6 @@ public class Bonk extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return (up ? shooting.getMaxLim() : shooting.getMinLim());
+    return (count >= 50);
   }
 }

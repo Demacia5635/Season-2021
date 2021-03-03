@@ -7,6 +7,8 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.sensors.PigeonIMU;
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.Drive;
@@ -46,6 +48,8 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
   }
+
+  public static PigeonIMU gyro;
 
   /**
    * Use this method to define your button->command mappings. Buttons can be

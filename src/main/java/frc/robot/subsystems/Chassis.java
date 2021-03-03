@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase; // import the base subsystem (which we extend)
 import frc.robot.Constants; // import all the measured constants
+import frc.robot.RobotContainer;
 import frc.robot.commands.Drive.DriveStates;
 import frc.robot.utils.GroupOfMotors;
 
@@ -62,8 +63,8 @@ public class Chassis extends SubsystemBase {
     } else {
       this.right = new GroupOfMotors(rightFront, rightBack);
       this.left = new GroupOfMotors(leftFront, leftBack);
-      this.gyro = new PigeonIMU(Constants.GYRO_PORT);
-      this.gyro.setFusedHeading(0);
+      this.gyro = RobotContainer.gyro;
+
     }
     m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(gyro.getFusedHeading()));
   }
@@ -74,7 +75,10 @@ public class Chassis extends SubsystemBase {
   }
 
   public double getFusedHeading(){
-    return gyro.getFusedHeading();
+    if (gyro != null){
+      return gyro.getFusedHeading();
+    }
+    return 0;
   }
 
   public double getAngle() {

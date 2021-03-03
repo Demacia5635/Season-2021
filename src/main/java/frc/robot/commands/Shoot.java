@@ -43,11 +43,9 @@ public class Shoot extends CommandBase {
   public void execute() {
     shooting.setHoodAngle(angleGetter.getAsDouble());
     shooting.setWheelVel(velGetter.getAsDouble());
-    if (shooting.getMaxLim()) {
-      shooting.setBonk(0);
-    } else if (Math.abs(shooting.getWheelVel() - vel) <= 0.01
+    if (Math.abs(shooting.getWheelVel() - vel) <= 0.01
         && Math.abs(shooting.getHoodAngle() - angle) <= 0.1) {
-          if (!shooting.getMaxLim()) shooting.setBonk(1);
+          shooting.setBonk(1);
           shooting.setVacuum(true);
         }
   }

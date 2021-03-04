@@ -17,17 +17,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 public class Drive extends CommandBase {
 
-  public enum InputHandler {
-    tank, singer, triggerTurns, YandX
-  }
-
   public enum DriveStates {
     curvatureDrive, arcadeDrive, angularVelocity, radialAccelaration
   }
 
   private final Chassis chassis;
   private XboxController controller;
-  private InputHandler inputHandler;
   private DriveStates driveState;
   private double velocity;
   private double turns;
@@ -35,11 +30,10 @@ public class Drive extends CommandBase {
   /**
    * Creates a new Drive.
    */
-  public Drive(Chassis chassis, InputHandler inputHandler, DriveStates driveState) {
+  public Drive(Chassis chassis, DriveStates driveState) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.chassis = chassis;
     controller = new XboxController(Constants.XBOX_PORT);
-    this.inputHandler = inputHandler;
     this.driveState = driveState;
     this.velocity = 0;
     this.turns = 0;
@@ -57,52 +51,34 @@ public class Drive extends CommandBase {
   public void execute() {
     this.velocity = 0;
     this.turns = 0;
-    switch (inputHandler) {
-      case YandX:
-        velocity = controller.getY(Hand.kLeft);
-        turns = controller.getX(Hand.kRight);
+    velocity = controller.getTriggerAxis(Hand.kRight) - controller.getTriggerAxis(Hand.kLeft);
+    turns = controller.getX(Hand.kLeft);
+    switch (driveState) {
+      case arcadeDrive:
+        chassis.arcadeDrive(velocity, turns, true);
         break;
-      case tank:
-        chassis.setVelocity(controller.getY(Hand.kRight) * Constants.MAX_VELOCITY,
-            controller.getY(Hand.kLeft) * Constants.MAX_VELOCITY);
+      case curvatureDrive:
+        boolean isQuickTurn = controller.getBumper(Hand.kRight);
+        chassis.curvatureDrive(velocity, turns, isQuickTurn);
         break;
-      case singer:
-        velocity = controller.getTriggerAxis(Hand.kRight) - controller.getTriggerAxis(Hand.kLeft);
-        turns = controller.getX(Hand.kLeft);
+      case radialAccelaration:
+        if (Math.abs(velocity) < 0.02) {
+          velocity = 0;
+        }
+        if (Math.abs(turns) < 0.02) {
+          turns = 0;
+        }
+        chassis.radialAccelaration(velocity, turns);
         break;
-      case triggerTurns:
-        velocity = controller.getY(Hand.kLeft);
-        turns = controller.getTriggerAxis(Hand.kRight) - controller.getTriggerAxis(Hand.kLeft);
+      case angularVelocity:
+        if (Math.abs(velocity) < 0.02) {
+          velocity = 0;
+        }
+        if (Math.abs(turns) < 0.02) {
+          turns = 0;
+        }
+        chassis.angularVelocity(velocity, turns);
         break;
-    }
-    if (inputHandler != InputHandler.tank) {
-      switch (driveState) {
-        case arcadeDrive:
-          chassis.arcadeDrive(velocity, turns, true);
-          break;
-        case curvatureDrive:
-          boolean isQuickTurn = controller.getBumper(Hand.kRight);
-          chassis.curvatureDrive(velocity, turns, isQuickTurn);
-          break;
-        case radialAccelaration:
-          if (Math.abs(velocity) < 0.02) {
-            velocity = 0;
-          }
-          if (Math.abs(turns) < 0.02) {
-            turns = 0;
-          }
-          chassis.radialAccelaration(velocity, turns);
-          break;
-        case angularVelocity:
-          if (Math.abs(velocity) < 0.02) {
-            velocity = 0;
-          }
-          if (Math.abs(turns) < 0.02) {
-            turns = 0;
-          }
-          chassis.angularVelocity(velocity, turns);
-          break;
-      }
     }
   }
 

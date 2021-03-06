@@ -39,6 +39,5 @@ public class Roulette extends SubsystemBase {
 
   @Override
   public void periodic() {
-
   }
 }

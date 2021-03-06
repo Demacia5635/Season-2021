@@ -18,8 +18,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * project.
  */
 public class Robot extends TimedRobot {
-  private Command[] m_autonomousCommands;
-  private Command[] m_teleopCommands;
+  private Command[] m_autonomousCommands = new Command[] {};
+  private Command[] m_teleopCommands = new Command[] {};
 
   private RobotContainer m_robotContainer;
 

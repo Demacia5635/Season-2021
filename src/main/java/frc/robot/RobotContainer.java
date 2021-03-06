@@ -7,11 +7,21 @@
 
 package frc.robot;
 
+import java.io.IOException;
+import java.nio.file.Path;
+
 import com.ctre.phoenix.sensors.PigeonIMU;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import frc.robot.commands.Drive;
 import frc.robot.commands.Drive.DriveStates;
 import frc.robot.commands.Drive.InputHandler;
@@ -20,7 +30,6 @@ import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Pickup;
 import frc.robot.subsystems.Roulette;
 import frc.robot.subsystems.Shooting;
-import edu.wpi.first.wpilibj2.command.Command;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -66,7 +75,31 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+  }
 
+  /**
+   * Gets the path following command needed for the path following
+   * 
+   * @return The path following command
+   */
+  private Command getPathFollowingCommand() {
+    final String trajectoryJSON = "paths/output/Test.wpilib.json";
+    Trajectory trajectory = new Trajectory();
+
+    try {
+      Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+      trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+    } catch (IOException ex) {
+      DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
+    }
+
+    RamseteCommand cmd = new RamseteCommand(trajectory, chassis::getPose,
+        new RamseteController(Constants.RAMSETE_B, Constants.RAMSETE_ZETA),
+        Constants.DRIVE_KINEMATICS, chassis::setVelocity, chassis);
+
+    chassis.resetOdometry(trajectory.getInitialPose());
+
+    return cmd.andThen(() -> chassis.setVelocity(0, 0));
   }
 
   /**
@@ -75,11 +108,10 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command[] getAutonomousCommands() {
-    // An ExampleCommand will run in autonomous
-    return null;
+    return new Command[] { getPathFollowingCommand() };
   }
 
   public Command[] getTeleopCommands() {
-    return new Command[] {driveCommand};
+    return new Command[] { driveCommand };
   }
 }

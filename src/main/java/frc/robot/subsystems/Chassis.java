@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive; // import the diffrential drive
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 // some debugging power
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -293,40 +294,24 @@ public class Chassis extends SubsystemBase {
     this.setPos2(this.left.getEncoder() + distance, this.right.getEncoder() + distance);
   }
 
-  public void configMotionMagic() {
-    this.left.setMotionSCurve(Constants.MOTION_S_CURVE);
-    this.left.setCruiseVelocity(Constants.CRUISE_VELOCITY);
-    this.left.setAcceleration(Constants.ACCELERATION);
-    this.right.setMotionSCurve(Constants.MOTION_S_CURVE);
-    this.right.setCruiseVelocity(Constants.CRUISE_VELOCITY);
-    this.right.setAcceleration(Constants.ACCELERATION);
+  public void configMotionMagic(double accelaration, double curve) {
+    for (GroupOfMotors motor : new GroupOfMotors[] { left, right }) {
+      motor.setMotionSCurve((int) curve);
+      motor.setCruiseVelocity(Constants.CRUISE_VELOCITY);
+      motor.setAcceleration(accelaration);
+    }
   }
 
-  public void configMotionMagic(double accelaration) {
-    this.left.setMotionSCurve(Constants.MOTION_S_CURVE);
-    this.left.setCruiseVelocity(Constants.CRUISE_VELOCITY);
-    this.left.setAcceleration(accelaration);
-    this.right.setMotionSCurve(Constants.MOTION_S_CURVE);
-    this.right.setCruiseVelocity(Constants.CRUISE_VELOCITY);
-    this.right.setAcceleration(accelaration);
+  public void configMotionMagic() {
+    configMotionMagic(Constants.ACCELERATION, Constants.MOTION_S_CURVE);
+  }
+
+  public void configMotionMagic(double acceleration) {
+    configMotionMagic(acceleration, Constants.MOTION_S_CURVE);
   }
 
   public void configMotionMagic(int curve) {
-    this.left.setMotionSCurve(curve);
-    this.left.setCruiseVelocity(Constants.CRUISE_VELOCITY);
-    this.left.setAcceleration(Constants.ACCELERATION);
-    this.right.setMotionSCurve(curve);
-    this.right.setCruiseVelocity(Constants.CRUISE_VELOCITY);
-    this.right.setAcceleration(Constants.ACCELERATION);
-  }
-
-  public void configMotionMagic(double accelaration, int curve) {
-    this.left.setMotionSCurve(curve);
-    this.left.setCruiseVelocity(Constants.CRUISE_VELOCITY);
-    this.left.setAcceleration(accelaration);
-    this.right.setMotionSCurve(curve);
-    this.right.setCruiseVelocity(Constants.CRUISE_VELOCITY);
-    this.right.setAcceleration(accelaration);
+    configMotionMagic(Constants.ACCELERATION, curve);
   }
 
   public double getPosLeft() {
@@ -353,4 +338,64 @@ public class Chassis extends SubsystemBase {
     }
     builder.addDoubleProperty("Angle", this::getAngle, null);
   }
+
+  // public void setPower(int left, int right) {
+  // this.left.setPower(left);
+  // this.right.setPower(right);
+  // }
+  public void setPower(double left, double right) {
+    this.left.setPower(left);
+    this.right.setPower(right);
+  }
+
+  public double getRightDistance() {
+    return this.right.getDistance();
+  }
+
+  public double getLeftDistance() {
+    return this.left.getDistance();
+  }
+
+  public double getChassisDistance() {
+    return (this.getLeftDistance() + this.getRightDistance()) / 2;
+  }
+
+  /**
+   * 
+   * @param angle - an angle between 0 to 360
+   * 
+   * @return - return the angle between 180 to -180
+   */
+  public double normalizeAngle(double angle) {
+    return Math.IEEEremainder(angle, 360);
+  }
+
+  public double getNormalizedAngle() { // returns the angle of the robot between 180 to -180
+    return normalizeAngle(getAngle());
+  }
+
+  /**
+   * 
+   * @param reqAngle
+   * @param curAngle
+   * 
+   * @return returns the smallest delta between the angles
+   */
+  public double diffAngle(double reqAngle, double curAngle) { // returns the shortest angle to what
+                                                              // you want
+    double a1 = normalizeAngle(reqAngle) - normalizeAngle(curAngle);
+    if (a1 <= -180) {
+      return a1 + 360;
+    } else if (a1 > 180) {
+      return a1 - 360;
+    } else {
+      return a1;
+    }
+  }
+
+  public double getAngle2Pose(Pose2d pose) {
+    Translation2d translation2d = pose.getTranslation().minus(getPose().getTranslation());
+    return new Rotation2d(translation2d.getX(), translation2d.getY()).getDegrees();
+  }
+
 }

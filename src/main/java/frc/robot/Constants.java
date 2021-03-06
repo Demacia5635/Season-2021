@@ -67,7 +67,7 @@ public final class Constants {
     public static final double CHASSIS_KA = 0.862;
 
     /**
-     * Path Following
+     * AutoNav
      */
 
      // DifferentialDriveKinematics

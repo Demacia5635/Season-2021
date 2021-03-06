@@ -78,11 +78,12 @@ public class RobotContainer {
   }
 
   /**
-   * Gets the path following command needed for the path following
+   * Attempts the AutoNav challenge.
+   * Opens the json file of the selected path, and follows it.
    * 
-   * @return The path following command
+   * @return the AutoNav command
    */
-  private Command getPathFollowingCommand() {
+  private Command getAutoNavCommand() {
     final String trajectoryJSON = "paths/output/Test.wpilib.json";
     Trajectory trajectory = new Trajectory();
 
@@ -103,12 +104,23 @@ public class RobotContainer {
   }
 
   /**
+   * Attempts the Galactic Search challenge.
+   * Detects whether the path is path A or B and whether it is the red or blue path.
+   * Afterwards it finds the closest ball, drives to it, and picks it up.
+   * 
+   * @return the Galactic Search command
+   */
+  private Command getGalacticSearchCommand() {
+    return null;
+  }
+
+  /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */
   public Command[] getAutonomousCommands() {
-    return new Command[] { getPathFollowingCommand() };
+    return new Command[] { getAutoNavCommand(), getGalacticSearchCommand() };
   }
 
   public Command[] getTeleopCommands() {

@@ -34,39 +34,27 @@ public class Chassis extends SubsystemBase {
   private GroupOfMotors right;
   private GroupOfMotors left;
   private PigeonIMU gyro;
-  private DifferentialDrive m_drive; // instance of the premade diffrential drive
-  private SpeedControllerGroup leftMotors; // a group which contains both left motors
-  private SpeedControllerGroup rightMotors; // a group which contains both right motors
   private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(
       Constants.CHASSIS_KS, Constants.CHASSIS_KV, Constants.CHASSIS_KA);
-  private DriveStates state;
 
   /**
    * Creates a new Chassis.
    */
-  public Chassis(DriveStates dStates) {
-    state = dStates;
+  public Chassis() {
 
     WPI_TalonFX rightFront = new WPI_TalonFX(Constants.RIGHT_FRONT);
     WPI_TalonFX leftFront = new WPI_TalonFX(Constants.LEFT_FRONT);
     WPI_TalonFX rightBack = new WPI_TalonFX(Constants.RIGHT_BACK);
     WPI_TalonFX leftBack = new WPI_TalonFX(Constants.LEFT_BACK);
 
-    leftFront.setInverted(true);
-    leftBack.setInverted(true);
+    rightFront.setInverted(true);
+    rightBack.setInverted(true);
 
-    if (dStates == DriveStates.arcadeDrive || dStates == DriveStates.curvatureDrive) {
-      this.leftMotors = new SpeedControllerGroup(leftFront, leftBack);
-      this.rightMotors = new SpeedControllerGroup(rightFront, rightBack);
-      this.m_drive = new DifferentialDrive(this.leftMotors, this.rightMotors);
-      leftMotors.setInverted(true);
-    } else {
-      this.right = new GroupOfMotors(rightFront, rightBack);
-      this.left = new GroupOfMotors(leftFront, leftBack);
-      this.gyro = RobotContainer.gyro;
-      left.resetEncoder();
-      right.resetEncoder();
-    }
+    this.right = new GroupOfMotors(rightFront, rightBack);
+    this.left = new GroupOfMotors(leftFront, leftBack);
+    this.gyro = RobotContainer.gyro;
+    left.resetEncoder();
+    right.resetEncoder();
     m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getFusedHeading()));
   }
 
@@ -75,12 +63,12 @@ public class Chassis extends SubsystemBase {
     this.right.setVelocity(right, feedforward);
   }
 
-  public double getFusedHeading(){
-    if (gyro != null){
+  public double getFusedHeading() {
+    if (gyro != null) {
       return gyro.getFusedHeading();
     } else {
       gyro = RobotContainer.gyro;
-      if (gyro != null){
+      if (gyro != null) {
         return gyro.getFusedHeading();
       }
     }
@@ -178,24 +166,6 @@ public class Chassis extends SubsystemBase {
       left = turns * (Constants.ROBOT_TRACK_WIDTH / 2);
     }
     setVelocity(left, right);
-  }
-
-  public void arcadeDrive(double xSpeed, double zRotation, boolean squareInputs) {
-    // xSpeed - The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
-    // zRotation - The robot's rotation rate around the Z axis [-1.0..1.0].
-    // Clockwise is positive.
-    // squareInputs - If set, decreases the input sensitivity at low speeds.
-    this.m_drive.arcadeDrive(xSpeed, zRotation, squareInputs);
-  }
-
-  public void curvatureDrive(double xSpeed, double zRotation, boolean isQuickTurn) {
-    // xSpeed - The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
-    // zRotation - The robot's rotation rate around the Z axis [-1.0..1.0].
-    // Clockwise is positive.
-    // isQuickTurn - If set, overrides constant-curvature turning for turn-in-place
-    // maneuvers.
-
-    this.m_drive.curvatureDrive(xSpeed, zRotation, isQuickTurn);
   }
 
   /**
@@ -345,12 +315,10 @@ public class Chassis extends SubsystemBase {
   @Override
   public void initSendable(SendableBuilder builder) {
     // builder.addDoubleProperty(key, getter, setter);
-    if (state == DriveStates.angularVelocity || state == DriveStates.radialAccelaration) {
-      builder.addDoubleProperty("Left Distance", this::getLeftPos, null);
-      builder.addDoubleProperty("Right Distance", this::getRightPos, null);
-      builder.addDoubleProperty("Left Speed", this::getLeftVelocity, null);
-      builder.addDoubleProperty("Right Speed", this::getRightVelocity, null);
-    }
+    builder.addDoubleProperty("Left Distance", this::getLeftPos, null);
+    builder.addDoubleProperty("Right Distance", this::getRightPos, null);
+    builder.addDoubleProperty("Left Speed", this::getLeftVelocity, null);
+    builder.addDoubleProperty("Right Speed", this::getRightVelocity, null);
     builder.addDoubleProperty("Angle", this::getAngle, null);
   }
 }

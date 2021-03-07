@@ -22,6 +22,8 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
+import edu.wpi.first.wpilibj2.command.SelectCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.Drive;
 import frc.robot.commands.Drive.DriveStates;
 import frc.robot.commands.Drive.InputHandler;
@@ -105,13 +107,51 @@ public class RobotContainer {
 
   /**
    * Attempts the Galactic Search challenge.
-   * Detects whether the path is path A or B and whether it is the red or blue path.
-   * Afterwards it finds the closest ball, drives to it, and picks it up.
+   * Detects whether the path is path A or B and whether it is the red or blue
+   * path.
+   * Afterwards it finds each power cell, drives to it, and picks it up.
    * 
    * @return the Galactic Search command
    */
   private Command getGalacticSearchCommand() {
-    return null;
+    return new SelectCommand(() -> {
+      double angleToNearestBall = SmartDashboard.getNumber("VisionAngle", 0);
+      double distanceToNearestBall = SmartDashboard.getNumber("VisionDistance", 0);
+
+      // Path A
+      if (-2 <= angleToNearestBall && angleToNearestBall <= 2) {
+        // Red path
+        if (distanceToNearestBall < Constants.CHALLENGE_SPACE_WIDTH / 2) {
+          return SequentialCommandGroup.sequence(
+              chassis.driveToBallCommand(Constants.MAX_AUTOMATION_VELOCITY),
+              pickup.getPickupCommand(), chassis.findAndDriveToBall(true),
+              pickup.getPickupCommand(), chassis.findAndDriveToBall(false),
+              pickup.getPickupCommand());
+        }
+
+        // Blue path
+        return SequentialCommandGroup.sequence(
+            chassis.driveToBallCommand(Constants.MAX_AUTOMATION_VELOCITY),
+            pickup.getPickupCommand(), chassis.findAndDriveToBall(false), pickup.getPickupCommand(),
+            chassis.findAndDriveToBall(false), pickup.getPickupCommand());
+      }
+
+      // Path B
+
+      // Red path
+      if (distanceToNearestBall <= 140 * Constants.INCHES_TO_METERS) {
+        return SequentialCommandGroup.sequence(
+            chassis.driveToBallCommand(Constants.MAX_AUTOMATION_VELOCITY),
+            pickup.getPickupCommand(), chassis.findAndDriveToBall(false), pickup.getPickupCommand(),
+            chassis.findAndDriveToBall(false), pickup.getPickupCommand());
+      }
+
+      // Blue path
+      return SequentialCommandGroup.sequence(
+          chassis.driveToBallCommand(Constants.MAX_AUTOMATION_VELOCITY), pickup.getPickupCommand(),
+          chassis.findAndDriveToBall(false), pickup.getPickupCommand(),
+          chassis.findAndDriveToBall(true), pickup.getPickupCommand());
+    });
   }
 
   /**

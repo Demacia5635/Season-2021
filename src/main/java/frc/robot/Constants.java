@@ -56,7 +56,7 @@ public final class Constants {
     // velocity smoothing
     public static final double ACCELERATION = 10; // the acceletarion in sensor units per 100 ms
     public static final double CRUISE_VELOCITY = 5 * PULSES_PER_METER / 10; // the peak speed in
-                                                                            // sensor
+    // sensor
     // units per 100 ms
 
     public static final double CHASSIS_KP = 0.01;
@@ -67,10 +67,20 @@ public final class Constants {
     public static final double CHASSIS_KA = 0.862;
 
     /**
+     * Galactic Search
+     */
+    public static final double CHALLENGE_SPACE_WIDTH = 9.15;
+    public static final double CHALLENGE_SPACE_HEIGHT = 4.58;
+    public static final double MAX_AUTOMATION_VELOCITY = 4;
+    public static final double MAX_AUTOMATION_ACCELERATION = 2;
+
+    public static final double INCHES_TO_METERS = 0.0254;
+
+    /**
      * AutoNav
      */
 
-     // DifferentialDriveKinematics
+    // DifferentialDriveKinematics
     public static final DifferentialDriveKinematics DRIVE_KINEMATICS =
                                                                      new DifferentialDriveKinematics(
                                                                              ROBOT_TRACK_WIDTH);

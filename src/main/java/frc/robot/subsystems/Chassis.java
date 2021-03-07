@@ -20,8 +20,11 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 // some debugging power
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase; // import the base subsystem (which we extend)
 import frc.robot.Constants; // import all the measured constants
 import frc.robot.RobotContainer;
@@ -76,12 +79,12 @@ public class Chassis extends SubsystemBase {
     this.right.setVelocity(right, feedforward);
   }
 
-  public double getFusedHeading(){
-    if (gyro != null){
+  public double getFusedHeading() {
+    if (gyro != null) {
       return gyro.getFusedHeading();
     } else {
       gyro = RobotContainer.gyro;
-      if (gyro != null){
+      if (gyro != null) {
         return gyro.getFusedHeading();
       }
     }
@@ -270,6 +273,20 @@ public class Chassis extends SubsystemBase {
     }, () -> {
       return SmartDashboard.getNumber("VisionDistance", 0) == 0;
     });
+  }
+
+  /**
+   * Finds the nearest ball and drives to it.
+   * 
+   * @param isClockwise defines whether the robot would look for the ball by
+   *                    turning clockwise or counterclockwise.
+   * 
+   * @return the command that finds, and drives to the ball
+   */
+  public Command findAndDriveToBall(boolean isClockwise) {
+    return SequentialCommandGroup.sequence(driveToBallCommand(Constants.MAX_AUTOMATION_VELOCITY),
+        new RunCommand(() -> this.curvatureDrive(0, (isClockwise ? 1 : -1) * 0.5, true), this)
+            .withInterrupt(() -> (SmartDashboard.getNumber("VisionDistance", 0) > 0)));
   }
 
   public void setPos(double pos1, double pos2) {

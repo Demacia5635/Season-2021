@@ -14,15 +14,7 @@ import frc.robot.subsystems.Shooting;
 
 public class Shoot extends CommandBase {
   private Shooting shooting;
-  private double vel, angle;
   private DoubleSupplier velGetter, angleGetter;
-
-  public Shoot(Shooting shooting, double velocity, double angle) {
-    addRequirements(shooting);
-    this.shooting = shooting;
-    this.vel = velocity;
-    this.angle = angle;
-  }
 
   public Shoot(Shooting shooting, DoubleSupplier velGetter, DoubleSupplier angleGetter) {
     this.velGetter = velGetter;
@@ -43,8 +35,8 @@ public class Shoot extends CommandBase {
   public void execute() {
     shooting.setHoodAngle(angleGetter.getAsDouble());
     shooting.setWheelVel(velGetter.getAsDouble());
-    if (Math.abs(shooting.getWheelVel() - vel) <= 0.01
-        && Math.abs(shooting.getHoodAngle() - angle) <= 0.1) {
+    if (Math.abs(shooting.getWheelVel() - velGetter.getAsDouble()) <= 0.01
+        && Math.abs(shooting.getHoodAngle() - angleGetter.getAsDouble()) <= 0.1) {
           shooting.setBonk(1);
           shooting.setVacuum(true);
         }

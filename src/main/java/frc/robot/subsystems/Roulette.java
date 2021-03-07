@@ -10,6 +10,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -20,10 +21,16 @@ public class Roulette extends SubsystemBase {
 
   public Roulette() {
     roulette = new WPI_TalonSRX(Constants.ROULETTE_MOTOR_PORT);
+    roulette.setSelectedSensorPosition(0);
+    roulette.config_kP(0, 5);
+    roulette.config_kI(0, 0.001);
+    roulette.config_kD(0, 0.0001);
+    roulette.setSensorPhase(true);
+    //setDefaultCommand(getSpinCommand());
   }
 
   public void startSpin() {
-    roulette.set(ControlMode.PercentOutput, 0.1);
+    roulette.set(ControlMode.Velocity, -40);
   }
 
   public void stopSpin() {
@@ -37,7 +44,18 @@ public class Roulette extends SubsystemBase {
     return new StartEndCommand(this::startSpin, this::stopSpin, this);
   }
 
+  public double getEncoder(){
+    return roulette.getSelectedSensorPosition();
+  }
+
   @Override
   public void periodic() {
+  }
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    //builder.addDoubleProperty("Encoder", this::getEncoder, null);
+    roulette.initSendable(builder);
+    
+    //builder.addDoubleProperty("Velocity", this::, setter);
   }
 }

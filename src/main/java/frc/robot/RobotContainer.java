@@ -25,8 +25,6 @@ import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.Drive;
-import frc.robot.commands.Drive.DriveStates;
-import frc.robot.commands.Drive.InputHandler;
 import frc.robot.subsystems.Chassis;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Pickup;
@@ -45,9 +43,9 @@ import frc.robot.subsystems.Shooting;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final DriveStates dStates = DriveStates.curvatureDrive;
-  private final Chassis chassis = new Chassis(dStates);
-  private final Drive driveCommand = new Drive(chassis, InputHandler.singer, dStates);
+  private final XboxController mainController = new XboxController(Constants.XBOX_PORT);
+  private final Chassis chassis = new Chassis();
+  private final Drive driveCommand = new Drive(chassis, mainController);
   private final Climb climb = new Climb();
   private final Pickup pickup = new Pickup();
   private final Roulette roulette = new Roulette();
@@ -160,7 +158,8 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command[] getAutonomousCommands() {
-    return new Command[] { getAutoNavCommand(), getGalacticSearchCommand() };
+    return new Command[] { getAutoNavCommand(), getGalacticSearchCommand(),
+                           shooting.getshootercmd()/* pickup.getPickupCommand() */ };
   }
 
   public Command[] getTeleopCommands() {

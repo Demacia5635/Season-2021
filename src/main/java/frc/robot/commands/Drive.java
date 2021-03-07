@@ -27,20 +27,16 @@ public class Drive extends CommandBase {
 
   private final Chassis chassis;
   private XboxController controller;
-  private InputHandler inputHandler;
-  private DriveStates driveState;
   private double velocity;
   private double turns;
 
   /**
    * Creates a new Drive.
    */
-  public Drive(Chassis chassis, InputHandler inputHandler, DriveStates driveState) {
+  public Drive(Chassis chassis, XboxController controller) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.chassis = chassis;
-    controller = new XboxController(Constants.XBOX_PORT);
-    this.inputHandler = inputHandler;
-    this.driveState = driveState;
+    this.controller = controller;
     this.velocity = 0;
     this.turns = 0;
     addRequirements(chassis);
@@ -57,53 +53,15 @@ public class Drive extends CommandBase {
   public void execute() {
     this.velocity = 0;
     this.turns = 0;
-    switch (inputHandler) {
-      case YandX:
-        velocity = controller.getY(Hand.kLeft);
-        turns = controller.getX(Hand.kRight);
-        break;
-      case tank:
-        chassis.setVelocity(controller.getY(Hand.kRight) * Constants.MAX_VELOCITY,
-            controller.getY(Hand.kLeft) * Constants.MAX_VELOCITY);
-        break;
-      case singer:
-        velocity = controller.getTriggerAxis(Hand.kRight) - controller.getTriggerAxis(Hand.kLeft);
-        turns = controller.getX(Hand.kLeft);
-        break;
-      case triggerTurns:
-        velocity = controller.getY(Hand.kLeft);
-        turns = controller.getTriggerAxis(Hand.kRight) - controller.getTriggerAxis(Hand.kLeft);
-        break;
+    velocity = controller.getTriggerAxis(Hand.kRight) - controller.getTriggerAxis(Hand.kLeft);
+    turns = controller.getX(Hand.kLeft);
+    if (Math.abs(velocity) < 0.02) {
+      velocity = 0;
     }
-    if (inputHandler != InputHandler.tank) {
-      switch (driveState) {
-        case arcadeDrive:
-          chassis.arcadeDrive(velocity, turns, true);
-          break;
-        case curvatureDrive:
-          boolean isQuickTurn = controller.getBumper(Hand.kRight);
-          chassis.curvatureDrive(velocity, turns, isQuickTurn);
-          break;
-        case radialAccelaration:
-          if (Math.abs(velocity) < 0.02) {
-            velocity = 0;
-          }
-          if (Math.abs(turns) < 0.02) {
-            turns = 0;
-          }
-          chassis.radialAccelaration(velocity, turns);
-          break;
-        case angularVelocity:
-          if (Math.abs(velocity) < 0.02) {
-            velocity = 0;
-          }
-          if (Math.abs(turns) < 0.02) {
-            turns = 0;
-          }
-          chassis.angularVelocity(velocity, turns);
-          break;
-      }
+    if (Math.abs(turns) < 0.02) {
+      turns = 0;
     }
+    chassis.angularVelocity(velocity, turns);
   }
 
   // Called once the command ends or is interrupted.

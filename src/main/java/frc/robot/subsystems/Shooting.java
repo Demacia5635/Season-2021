@@ -15,6 +15,7 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -25,6 +26,7 @@ public class Shooting extends SubsystemBase {
   private WPI_TalonSRX bonker;
   private WPI_TalonSRX hoodMotor;
   private WPI_TalonSRX vacuumMotor;
+  private int hoodSwitchLastCycle;
   private boolean vacuumState;// true if on, false if off
 
   public Shooting() {
@@ -33,17 +35,22 @@ public class Shooting extends SubsystemBase {
     hoodMotor = new WPI_TalonSRX(Constants.HOOD_MOTOR_PORT);
     vacuumMotor = new WPI_TalonSRX(Constants.VACUUM_MOTOR_PORT);
     bigWheel.setInverted(InvertType.InvertMotorOutput);
+    hoodMotor.setSensorPhase(true);
+    hoodMotor.setInverted(true);
     bigWheel.setSensorPhase(true);
     bigWheel.config_kP(0, Constants.SHOOTER_KP);
     hoodMotor.config_kP(0, Constants.HOOD_KP);
+    hoodMotor.config_kI(0, Constants.HOOD_KI);
+    hoodSwitchLastCycle = (int) getHoodLimit();
 
     bonker.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector,
         LimitSwitchNormal.NormallyOpen);
     bonker.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector,
         LimitSwitchNormal.NormallyOpen);
-    hoodMotor.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector,
+    hoodMotor.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector,
         LimitSwitchNormal.NormallyOpen);
     vacuumState = false;
+    //setDefaultCommand(new RunCommand(this::getHoodBack, this));
   }
 
   /**
@@ -52,7 +59,10 @@ public class Shooting extends SubsystemBase {
    * @param angle The desired angle of the hood 0 means it's original position.
    */
   public void setHoodAngle(double angle) {
-    hoodMotor.set(ControlMode.Position, angle * 800. / 360.);
+    if (getHoodLimit() == 0 || angle > 0) {
+      hoodMotor.set(ControlMode.Position, angle * 800. / 360.);
+    }
+
   }
 
   /**
@@ -93,6 +103,28 @@ public class Shooting extends SubsystemBase {
     return bigWheel.getSelectedSensorVelocity() * 10. * 360. / 800.;
   }
 
+  public StartEndCommand getHoodCommand() {
+    return new StartEndCommand(this::setHoodOn, this::setHoodOff, this);
+  }
+
+  public void setHoodOn() {
+    // setHoodAngle(10);
+    if (getHoodLimit() == 0) {
+      hoodMotor.set(ControlMode.PercentOutput, -0.2);
+    }
+
+  }
+
+  public void getHoodBack() {
+    if (getHoodLimit() == 0) {
+      hoodMotor.set(ControlMode.PercentOutput, -0.1);
+    }
+  }
+
+  public void setHoodOff() {
+    hoodMotor.set(ControlMode.PercentOutput, 0);
+  }
+
   /**
    * 
    * @return The angle of the hood in degrees.
@@ -111,7 +143,10 @@ public class Shooting extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    if (hoodSwitchLastCycle == 0 && getHoodLimit() == 1) {
+      resetHoodEncoder();
+    }
+    hoodSwitchLastCycle = (int) getHoodLimit();
   }
 
   public double getForwardSwitch() {
@@ -122,21 +157,25 @@ public class Shooting extends SubsystemBase {
     return bonker.isRevLimitSwitchClosed();
   }
 
-  public double getHoodLimit(){
-    return hoodMotor.isFwdLimitSwitchClosed();
+  public double getHoodLimit() {
+    return hoodMotor.isRevLimitSwitchClosed();
   }
 
-  public void setWheelpower(){
+  public void setWheelpower() {
     setWheelVel(6000);
     setVacuum(true);
   }
 
-  public void stopWheel(){
+  public void resetHoodEncoder() {
+    hoodMotor.setSelectedSensorPosition(0);
+  }
+
+  public void stopWheel() {
     bigWheel.set(ControlMode.PercentOutput, 0);
     setVacuum(false);
   }
 
-  public StartEndCommand getshootercmd(){
+  public StartEndCommand getshootercmd() {
     return new StartEndCommand(this::setWheelpower, this::stopWheel, this);
   }
 
@@ -147,5 +186,7 @@ public class Shooting extends SubsystemBase {
     builder.addDoubleProperty("Bonk forward swtich", this::getForwardSwitch, null);
     builder.addDoubleProperty("Bonk reverse swtich", this::getReverseSwitch, null);
     builder.addDoubleProperty("Hood limit", this::getHoodLimit, null);
+    hoodMotor.initSendable(builder);
   }
+
 }

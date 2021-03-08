@@ -30,6 +30,7 @@ public class Pickup extends SubsystemBase {
     armMotor = new WPI_TalonSRX(Constants.ARM_MOTOR_PORT);
     armMotor.config_kP(0, Constants.ARM_KP);
     armMotor.configSelectedFeedbackCoefficient(360. / 800.);
+    armMotor.setInverted(true);
     armMotor.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector,
         LimitSwitchNormal.NormallyOpen);
     gyro = new PigeonIMU(pickupMotor);
@@ -85,9 +86,22 @@ public class Pickup extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
+  public void moveArm() {
+    armMotor.set(ControlMode.PercentOutput, 0.1);
+  }
+
+  public void stopArm(){
+    armMotor.set(ControlMode.PercentOutput, 0);
+  }
+
+  public StartEndCommand getarmMoveCommand(){
+    return new StartEndCommand(this::moveArm, this::stopArm, this);
+  }
+
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.addDoubleProperty("Arm Position", this::getArmPosition, null);
     builder.addDoubleProperty("Arm Limit", this::getArmLimit, null);
+    armMotor.initSendable(builder);
   }
 }

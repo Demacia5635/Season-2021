@@ -53,8 +53,8 @@ public class Roulette extends SubsystemBase {
   }
   @Override
   public void initSendable(SendableBuilder builder) {
-    //builder.addDoubleProperty("Encoder", this::getEncoder, null);
-    roulette.initSendable(builder);
+    builder.addDoubleProperty("Encoder", this::getEncoder, null);
+   //roulette.initSendable(builder);
     
     //builder.addDoubleProperty("Velocity", this::, setter);
   }

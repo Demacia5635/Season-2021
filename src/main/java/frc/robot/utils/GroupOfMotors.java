@@ -47,11 +47,11 @@ public class GroupOfMotors {
         this.lead = talons[0];
         this.lead.config_kP(0, Constants.CHASSIS_KP);
         this.lead.config_kD(0, Constants.CHASSIS_KD);
-        this.lead.setNeutralMode(NeutralMode.Coast);
+        this.lead.setNeutralMode(NeutralMode.Brake);
         followers = new WPI_TalonFX[talons.length - 1];
         for (int i = 0; i < followers.length; i++) {
             followers[i] = talons[i + 1];
-            followers[i].setNeutralMode(NeutralMode.Coast);
+            followers[i].setNeutralMode(NeutralMode.Brake);
             followers[i].follow(lead);
         }
     }

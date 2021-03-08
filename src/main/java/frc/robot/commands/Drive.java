@@ -17,10 +17,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 public class Drive extends CommandBase {
 
-  public enum InputHandler {
-    tank, singer, triggerTurns, YandX
-  }
-
   public enum DriveStates {
     curvatureDrive, arcadeDrive, angularVelocity, radialAccelaration
   }

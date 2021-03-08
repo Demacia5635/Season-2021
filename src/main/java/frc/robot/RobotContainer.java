@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.Drive;
+import frc.robot.commands.Bonk;
 import frc.robot.subsystems.Chassis;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Pickup;
@@ -157,8 +158,8 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command[] getAutonomousCommands() {
-    return new Command[] { getAutoNavCommand(), getGalacticSearchCommand(),
-                           shooting.getshootercmd()/* pickup.getPickupCommand() */ };
+    return new Command[] { /*shooting.getHoodCommand()*/ /*getAutoNavCommand(), getGalacticSearchCommand(),
+    shooting.getshootercmd()*//* pickup.getPickupCommand()  new Bonk(shooting, true)*/ /*pickup.getarmMoveCommand()*/};
   }
 
   public Command[] getTeleopCommands() {

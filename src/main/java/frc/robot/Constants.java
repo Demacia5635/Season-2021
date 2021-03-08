@@ -35,7 +35,8 @@ public final class Constants {
     public static final double SHOOTER_KS = 1. / 11000.;
     public static final double SHOOTER_KV = 0.09;
     public static final double SHOOTER_KP = 0.001;
-    public static final double HOOD_KP = -1;
+    public static final double HOOD_KP = 0.1;
+    public static final double HOOD_KI = 0.01;
     public static final double ARM_KP = -1;
 
     public static final double ROULETTE_ROTATION_PER_SEC = 0.5;

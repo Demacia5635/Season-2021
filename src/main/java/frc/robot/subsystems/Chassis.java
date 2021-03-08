@@ -255,8 +255,8 @@ public class Chassis extends SubsystemBase {
    */
   public Command findAndDriveToBall(boolean isClockwise) {
     return SequentialCommandGroup.sequence(new RunCommand(() -> {
-      setVelocity((isClockwise ? 1 : -1) * Constants.MAX_VELOCITY / 2,
-          (isClockwise ? -1 : 1) * Constants.MAX_VELOCITY / 2);
+      setVelocity((isClockwise ? 1 : -1) * Constants.MAX_AUTOMATION_VELOCITY / 2,
+          (isClockwise ? -1 : 1) * Constants.MAX_AUTOMATION_VELOCITY / 2);
     }, this).withInterrupt(() -> (SmartDashboard.getNumber("VisionAngle", 0) == 0)),
         driveToBallCommand(Constants.MAX_AUTOMATION_VELOCITY));
   }

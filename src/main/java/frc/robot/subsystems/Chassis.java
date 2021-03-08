@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 // some debugging power
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -40,6 +41,7 @@ public class Chassis extends SubsystemBase {
   private PigeonIMU gyro;
   private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(
       Constants.CHASSIS_KS, Constants.CHASSIS_KV, Constants.CHASSIS_KA);
+  private final Field2d field = new Field2d();
 
   /**
    * Creates a new Chassis.
@@ -60,6 +62,8 @@ public class Chassis extends SubsystemBase {
     left.resetEncoder();
     right.resetEncoder();
     m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getFusedHeading()));
+
+    SmartDashboard.putData("Field", field);
   }
 
   public void setVelocity(double left, double right) {
@@ -314,6 +318,8 @@ public class Chassis extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    m_odometry.update(getRotation2d(), left.getDistance(), right.getDistance());
+    field.setRobotPose(m_odometry.getPoseMeters());
   }
 
   @Override
@@ -378,6 +384,10 @@ public class Chassis extends SubsystemBase {
     } else {
       return a1;
     }
+  }
+
+  public Rotation2d getRotation2d() {
+    return Rotation2d.fromDegrees(getAngle());
   }
 
   public double getAngle2Pose(Pose2d pose) {

@@ -26,7 +26,7 @@ public class Roulette extends SubsystemBase {
     roulette.config_kI(0, 0.001);
     roulette.config_kD(0, 0.0001);
     roulette.setSensorPhase(true);
-    //setDefaultCommand(getSpinCommand());
+    setDefaultCommand(getSpinCommand());
   }
 
   public void startSpin() {
@@ -53,8 +53,8 @@ public class Roulette extends SubsystemBase {
   }
   @Override
   public void initSendable(SendableBuilder builder) {
-    //builder.addDoubleProperty("Encoder", this::getEncoder, null);
-    roulette.initSendable(builder);
+    builder.addDoubleProperty("Encoder", this::getEncoder, null);
+   //roulette.initSendable(builder);
     
     //builder.addDoubleProperty("Velocity", this::, setter);
   }

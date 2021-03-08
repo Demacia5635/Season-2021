@@ -35,7 +35,8 @@ public final class Constants {
     public static final double SHOOTER_KS = 1. / 11000.;
     public static final double SHOOTER_KV = 0.09;
     public static final double SHOOTER_KP = 0.001;
-    public static final double HOOD_KP = -1;
+    public static final double HOOD_KP = 0.1;
+    public static final double HOOD_KI = 0.01;
     public static final double ARM_KP = -1;
 
     public static final double ROULETTE_ROTATION_PER_SEC = 0.5;
@@ -48,7 +49,7 @@ public final class Constants {
 
     public static final int XBOX_PORT = 0;
 
-    public static final double ROBOT_TRACK_WIDTH = 0.575; // In meters
+    public static final double ROBOT_TRACK_WIDTH = 0.59; // In meters
     public static final double MAX_VELOCITY = 2; // In meters per second
     public static final double MAX_RADIAL_ACCELARATION = 4; // In meters per squared second
     public static final double MAX_ANGULAR_VELOCITY = Math.PI; // In radians per second

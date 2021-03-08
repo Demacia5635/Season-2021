@@ -20,7 +20,7 @@ public class Bonk extends CommandBase {
 
   @Override
   public void initialize() {
-    shooting.setBonk(up ? 0.01 : -0.01);
+    shooting.setBonk(up ? 0.15 : -0.15);
     count = 0;
   }
 
@@ -36,6 +36,6 @@ public class Bonk extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return (count >= 50);
+    return (count >= 150);
   }
 }

@@ -19,6 +19,7 @@ public class Shoot extends CommandBase {
   public Shoot(Shooting shooting, DoubleSupplier velGetter, DoubleSupplier angleGetter) {
     this.velGetter = velGetter;
     this.angleGetter = angleGetter;
+    this.shooting = shooting;
   }
 
   public static enum ShootType {
@@ -33,18 +34,18 @@ public class Shoot extends CommandBase {
 
   @Override
   public void execute() {
-    shooting.setHoodAngle(angleGetter.getAsDouble());
+    //shooting.setHoodAngle(angleGetter.getAsDouble());
     shooting.setWheelVel(velGetter.getAsDouble());
-    if (Math.abs(shooting.getWheelVel() - velGetter.getAsDouble()) <= 0.01
-        && Math.abs(shooting.getHoodAngle() - angleGetter.getAsDouble()) <= 0.1) {
-          shooting.setBonk(1);
+    if (/*Math.abs(shooting.getWheelVel() - velGetter.getAsDouble()) <= 0.01
+        && true/*Math.abs(shooting.getHoodAngle() - angleGetter.getAsDouble()) <= 0.1*/true) {
+          shooting.setBonk(0.1);
           shooting.setVacuum(true);
         }
   }
 
   @Override
   public void end(boolean interrupted) {
-    shooting.setHoodAngle(0);
+    //shooting.setHoodAngle(0);
     shooting.setWheelVel(0);
     shooting.setVacuum(false);
     Bonk bonk = new Bonk(shooting, false);

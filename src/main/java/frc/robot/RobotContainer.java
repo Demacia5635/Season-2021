@@ -137,17 +137,16 @@ public class RobotContainer {
       // Path B
 
       // Red path
-      if (distanceToNearestBall <= 140 * Constants.INCHES_TO_METERS) {
-        return SequentialCommandGroup.sequence(
-            chassis.driveToBallCommand(Constants.MAX_AUTOMATION_VELOCITY),
+      if (distanceToNearestBall * Math.cos(Math.toRadians(angleToNearestBall)) <= 140
+          * Constants.INCHES_TO_METERS) {
+        return SequentialCommandGroup.sequence(chassis.findAndDriveToBall(true),
             pickup.getPickupCommand(), chassis.findAndDriveToBall(false), pickup.getPickupCommand(),
             chassis.findAndDriveToBall(false), pickup.getPickupCommand());
       }
 
       // Blue path
-      return SequentialCommandGroup.sequence(
-          chassis.driveToBallCommand(Constants.MAX_AUTOMATION_VELOCITY), pickup.getPickupCommand(),
-          chassis.findAndDriveToBall(false), pickup.getPickupCommand(),
+      return SequentialCommandGroup.sequence(chassis.findAndDriveToBall(true),
+          pickup.getPickupCommand(), chassis.findAndDriveToBall(false), pickup.getPickupCommand(),
           chassis.findAndDriveToBall(true), pickup.getPickupCommand());
     });
   }

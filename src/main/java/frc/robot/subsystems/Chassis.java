@@ -314,6 +314,7 @@ public class Chassis extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    m_odometry.update(getRotation2d(), left.getDistance(), right.getDistance());
   }
 
   @Override
@@ -378,6 +379,10 @@ public class Chassis extends SubsystemBase {
     } else {
       return a1;
     }
+  }
+
+  public Rotation2d getRotation2d() {
+    return Rotation2d.fromDegrees(getAngle());
   }
 
   public double getAngle2Pose(Pose2d pose) {

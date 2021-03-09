@@ -84,11 +84,11 @@ public class GroupOfMotors {
     }
 
     public void setPosition(double pos) {
-        this.lead.set(ControlMode.Position, pos);
+        this.lead.set(ControlMode.Position, pos * Constants.PULSES_PER_METER / 10.);
     }
 
     public void setPosition(double pos, SimpleMotorFeedforward aff) {
-        this.lead.set(ControlMode.Position, pos, DemandType.ArbitraryFeedForward, aff.calculate(0.001));
+        this.lead.set(ControlMode.Position, pos * Constants.PULSES_PER_METER / 10., DemandType.ArbitraryFeedForward, aff.calculate(0.001));
     }
 
     public void setMotionMagic(double pos, SimpleMotorFeedforward aff, double maxSpeed,

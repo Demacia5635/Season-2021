@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  */
 public class Turn extends CommandBase {
     private final double errorRange = 0.05; // In meters
+    private final double destination; // In Pulses
     private final double distance;
     private final Chassis chassis;
     private double startPosLeft;
@@ -43,6 +44,7 @@ public class Turn extends CommandBase {
         // Use addRequirements() here to declare subsystem dependencies.
         this.angle = angle;
         distance = angle * (2 * Math.PI * Constants.ROBOT_TRACK_WIDTH) / 360;
+        destination = (angle > 0 ? startPosRight : startPosLeft) - distance;
         addRequirements(chassis);
     }
 
@@ -56,9 +58,8 @@ public class Turn extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        double distance = (angle * 2 * Math.PI * Constants.ROBOT_TRACK_WIDTH / 360);
-        if (angle > 0) chassis.setRightPos(startPosRight - distance);
-        else chassis.setLeftPos(startPosLeft - distance);
+        if (angle > 0) chassis.setRightPos(destination);
+        else chassis.setLeftPos(destination);
     }
 
     // Called once the command ends or is interrupted.
@@ -69,11 +70,8 @@ public class Turn extends CommandBase {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return angle > 0
-                ? Math.abs(chassis.getRightPos() - (startPosRight - distance)) < errorRange
-                        * Constants.PULSES_PER_METER
-                : Math.abs(chassis.getLeftPos() - (startPosLeft - distance)) < errorRange
-                        * Constants.PULSES_PER_METER;
+        return angle > 0 ? Math.abs(chassis.getRightPos() - destination) < errorRange
+                : Math.abs(chassis.getLeftPos() - destination) < errorRange;
     }
 
     @Override

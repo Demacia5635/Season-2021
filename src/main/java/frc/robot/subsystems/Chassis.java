@@ -397,10 +397,10 @@ public class Chassis extends SubsystemBase {
     return new Rotation2d(translation2d.getX(), translation2d.getY()).getDegrees();
   }
 
-  public void startPosLeft(double distance) {
+  public void setPosLeft(double distance) {
     this.left.setPosition(distance);
   }
-  public void startPosRight(double distance) {
+  public void setPosRight(double distance) {
     this.right.setPosition(distance);
   }
 

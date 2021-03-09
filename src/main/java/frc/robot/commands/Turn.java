@@ -24,8 +24,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Turn extends CommandBase {
     private final Chassis chassis;
-    private double startPosLeft;
-    private double startPosRight;
+    private double setPosLeft;
+    private double setPosRight;
     private double angle;
     private boolean forward; 
     private XboxController controller;
@@ -55,8 +55,8 @@ public class Turn extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        this.startPosLeft = chassis.getLeftPos();
-        this.startPosRight = chassis.getRightPos();
+        this.setPosLeft = chassis.getLeftPos();
+        this.setPosRight = chassis.getRightPos();
         this.forward = controller.getY(Hand.kLeft) > 0; 
     }
 
@@ -65,12 +65,12 @@ public class Turn extends CommandBase {
     public void execute() {
         double distance = (angle * 2 * Math.PI * Constants.ROBOT_TRACK_WIDTH / 360); 
         if (this.forward) {
-            if (this.angle > 0) this.chassis.startPosLeft(this.startPosLeft + distance); 
-            else this.chassis.startPosRight(this.startPosRight + distance); 
+            if (this.angle > 0) this.chassis.setPosLeft(this.setPosLeft + distance); 
+            else this.chassis.setPosRight(this.setPosRight + distance); 
         }
         else {
-            if (this.angle > 0) this.chassis.startPosRight(this.startPosRight - distance); 
-            else this.chassis.startPosLeft(this.startPosLeft - distance); 
+            if (this.angle > 0) this.chassis.setPosRight(this.setPosRight - distance); 
+            else this.chassis.setPosLeft(this.setPosLeft - distance); 
         }
     }
 
@@ -84,16 +84,16 @@ public class Turn extends CommandBase {
     public boolean isFinished() {
         double distance = (angle * 2 * Math.PI * Constants.ROBOT_TRACK_WIDTH / 360); 
         if (this.forward) {
-            if (this.angle > 0) return this.chassis.getLeftPos() > 0.95 * (this.startPosLeft + distance)
-            && this.chassis.getLeftPos() < 1.05 * (this.startPosLeft + distance); 
-            else return this.chassis.getRightPos() > 0.95 * (this.startPosRight + distance)
-            && this.chassis.getRightPos() < 1.05 * (this.startPosRight + distance); 
+            if (this.angle > 0) return this.chassis.getLeftPos() > 0.95 * (this.setPosLeft + distance)
+            && this.chassis.getLeftPos() < 1.05 * (this.setPosLeft + distance); 
+            else return this.chassis.getRightPos() > 0.95 * (this.setPosRight + distance)
+            && this.chassis.getRightPos() < 1.05 * (this.setPosRight + distance); 
         }
         else {
-            if (this.angle > 0) return this.chassis.getRightPos() > 0.95 * (this.startPosRight - distance)
-            && this.chassis.getRightPos() < 1.05 * (this.startPosRight - distance); 
-            else return this.chassis.getLeftPos() > 0.95 * (this.startPosLeft - distance)
-            && this.chassis.getLeftPos() < 1.05 * (this.startPosLeft - distance); 
+            if (this.angle > 0) return this.chassis.getRightPos() > 0.95 * (this.setPosRight - distance)
+            && this.chassis.getRightPos() < 1.05 * (this.setPosRight - distance); 
+            else return this.chassis.getLeftPos() > 0.95 * (this.setPosLeft - distance)
+            && this.chassis.getLeftPos() < 1.05 * (this.setPosLeft - distance); 
         }
     }
 

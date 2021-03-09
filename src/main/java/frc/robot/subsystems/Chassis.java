@@ -275,16 +275,16 @@ public class Chassis extends SubsystemBase {
         driveToBallCommand(Constants.MAX_AUTOMATION_VELOCITY));
   }
 
-  public void setPos(double pos1, double pos2) {
-    this.left.setMotionMagic(pos1, this.feedforward, Constants.CRUISE_VELOCITY,
+  public void setPos(double posLeft, double posRight) {
+    this.left.setMotionMagic(posLeft, this.feedforward, Constants.CRUISE_VELOCITY,
         Constants.ACCELERATION);
-    this.right.setMotionMagic(pos1, this.feedforward, Constants.CRUISE_VELOCITY,
+    this.right.setMotionMagic(posLeft, this.feedforward, Constants.CRUISE_VELOCITY,
         Constants.ACCELERATION);
   }
 
-  public void setPos2(double pos1, double pos2) {
-    this.left.setMotionMagic(pos1);
-    this.right.setMotionMagic(pos1);
+  public void setPos2(double posLeft, double posRight) {
+    this.left.setMotionMagic(posLeft);
+    this.right.setMotionMagic(posRight);
   }
 
   public void goTo(double distanceLeft, double distanceRight) {

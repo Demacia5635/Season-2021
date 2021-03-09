@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 // some debugging power
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -29,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase; // import the base subsyste
 import frc.robot.Constants; // import all the measured constants
 import frc.robot.RobotContainer;
 import frc.robot.commands.Drive.DriveStates;
+import frc.robot.utils.FeedForward;
 import frc.robot.utils.GroupOfMotors;
 
 public class Chassis extends SubsystemBase {
@@ -40,6 +42,7 @@ public class Chassis extends SubsystemBase {
   private PigeonIMU gyro;
   private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(
       Constants.CHASSIS_KS, Constants.CHASSIS_KV, Constants.CHASSIS_KA);
+  private final Field2d field = new Field2d();
 
   /**
    * Creates a new Chassis.
@@ -60,6 +63,8 @@ public class Chassis extends SubsystemBase {
     left.resetEncoder();
     right.resetEncoder();
     m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getFusedHeading()));
+
+    SmartDashboard.putData("Field", field);
   }
 
   public void setVelocity(double left, double right) {
@@ -218,8 +223,8 @@ public class Chassis extends SubsystemBase {
    * @param speed - The velocity at which the robot will drive in Meters
    */
   public void driveToBall(double speed) {
-    double distance = SmartDashboard.getNumber("VisionDistance", 0);
-    double angle = SmartDashboard.getNumber("VisionAngle", 0);
+    double distance = SmartDashboard.getNumber("BallDistance", 0);
+    double angle = SmartDashboard.getNumber("BallAngle", 0);
     double radius = distance / (2 * Math.sin(angle * Math.PI / 180));
     double k = Constants.ROBOT_TRACK_WIDTH * 100 / 2;
     double left = speed * (1 + (k / radius));
@@ -241,7 +246,7 @@ public class Chassis extends SubsystemBase {
     }, (interrupted) -> {
       setVelocity(0, 0);
     }, () -> {
-      return SmartDashboard.getNumber("VisionDistance", 0) == 0;
+      return SmartDashboard.getNumber("BallDistance", 0) == 0;
     });
   }
 
@@ -255,9 +260,9 @@ public class Chassis extends SubsystemBase {
    */
   public Command findAndDriveToBall(boolean isClockwise) {
     return SequentialCommandGroup.sequence(new RunCommand(() -> {
-      setVelocity((isClockwise ? 1 : -1) * Constants.MAX_VELOCITY / 2,
-          (isClockwise ? -1 : 1) * Constants.MAX_VELOCITY / 2);
-    }, this).withInterrupt(() -> (SmartDashboard.getNumber("VisionAngle", 0) == 0)),
+      setVelocity((isClockwise ? 1 : -1) * Constants.MAX_AUTOMATION_VELOCITY / 2,
+          (isClockwise ? -1 : 1) * Constants.MAX_AUTOMATION_VELOCITY / 2);
+    }, this).withInterrupt(() -> (SmartDashboard.getNumber("BallAngle", 0) == 0)),
         driveToBallCommand(Constants.MAX_AUTOMATION_VELOCITY));
   }
 
@@ -314,22 +319,10 @@ public class Chassis extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    m_odometry.update(getRotation2d(), left.getDistance(), right.getDistance());
+    field.setRobotPose(m_odometry.getPoseMeters());
   }
 
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    // builder.addDoubleProperty(key, getter, setter);
-    builder.addDoubleProperty("Left Distance", this::getLeftPos, null);
-    builder.addDoubleProperty("Right Distance", this::getRightPos, null);
-    builder.addDoubleProperty("Left Speed", this::getLeftVelocity, null);
-    builder.addDoubleProperty("Right Speed", this::getRightVelocity, null);
-    builder.addDoubleProperty("Angle", this::getAngle, null);
-  }
-
-  // public void setPower(int left, int right) {
-  // this.left.setPower(left);
-  // this.right.setPower(right);
-  // }
   public void setPower(double left, double right) {
     this.left.setPower(left);
     this.right.setPower(right);
@@ -380,9 +373,28 @@ public class Chassis extends SubsystemBase {
     }
   }
 
+  public Rotation2d getRotation2d() {
+    return Rotation2d.fromDegrees(getAngle());
+  }
+
   public double getAngle2Pose(Pose2d pose) {
     Translation2d translation2d = pose.getTranslation().minus(getPose().getTranslation());
     return new Rotation2d(translation2d.getX(), translation2d.getY()).getDegrees();
   }
 
+  public void setVelocityOurFF(double left, double right) {
+        this.left.setVelocity(left, FeedForward.feedForwardLeftPower(left, right));
+        this.right.setVelocity(left, FeedForward.feedForwardRightPower(left, right));
+  }
+
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    // builder.addDoubleProperty(key, getter, setter);
+    builder.addDoubleProperty("Left Distance", this::getLeftPos, null);
+    builder.addDoubleProperty("Right Distance", this::getRightPos, null);
+    builder.addDoubleProperty("Left Speed", this::getLeftVelocity, null);
+    builder.addDoubleProperty("Right Speed", this::getRightVelocity, null);
+    builder.addDoubleProperty("Angle", this::getAngle, null);
+  }
 }

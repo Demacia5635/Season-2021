@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.ArmChange;
 import frc.robot.commands.Drive;
 import frc.robot.commands.*;
 import frc.robot.subsystems.Chassis;
@@ -115,43 +116,39 @@ public class RobotContainer {
    * @return the Galactic Search command
    */
   private Command getGalacticSearchCommand() {
-    return new SelectCommand(() -> {
-      double angleToNearestBall = SmartDashboard.getNumber("VisionAngle", 0);
-      double distanceToNearestBall = SmartDashboard.getNumber("VisionDistance", 0);
+    return SequentialCommandGroup.sequence(/*new ArmChange(ArmChange.Position.Bottom, pickup),*/
+        pickup.getPickupCommand(), new SelectCommand(() -> {
+          double angleToNearestBall = SmartDashboard.getNumber("BallAngle", 0);
+          double distanceToNearestBall = SmartDashboard.getNumber("BallDistance", 0);
 
-      // Path A
-      if (-2 <= angleToNearestBall && angleToNearestBall <= 2) {
-        // Red path
-        if (distanceToNearestBall < Constants.CHALLENGE_SPACE_WIDTH / 2) {
-          return SequentialCommandGroup.sequence(
-              chassis.driveToBallCommand(Constants.MAX_AUTOMATION_VELOCITY),
-              pickup.getPickupCommand(), chassis.findAndDriveToBall(true),
-              pickup.getPickupCommand(), chassis.findAndDriveToBall(false),
-              pickup.getPickupCommand());
-        }
+          // Path A
+          if (Math.abs(angleToNearestBall) <= 2) {
+            // Red path
+            if (distanceToNearestBall < Constants.CHALLENGE_SPACE_WIDTH / 2) {
+              return SequentialCommandGroup.sequence(
+                  chassis.driveToBallCommand(Constants.MAX_AUTOMATION_VELOCITY),
+                  chassis.findAndDriveToBall(true), chassis.findAndDriveToBall(false));
+            }
 
-        // Blue path
-        return SequentialCommandGroup.sequence(
-            chassis.driveToBallCommand(Constants.MAX_AUTOMATION_VELOCITY),
-            pickup.getPickupCommand(), chassis.findAndDriveToBall(false), pickup.getPickupCommand(),
-            chassis.findAndDriveToBall(false), pickup.getPickupCommand());
-      }
+            // Blue path
+            return SequentialCommandGroup.sequence(
+                chassis.driveToBallCommand(Constants.MAX_AUTOMATION_VELOCITY),
+                chassis.findAndDriveToBall(false), chassis.findAndDriveToBall(false));
+          }
 
-      // Path B
+          // Path B
 
-      // Red path
-      if (distanceToNearestBall * Math.cos(Math.toRadians(angleToNearestBall)) <= 140
-          * Constants.INCHES_TO_METERS) {
-        return SequentialCommandGroup.sequence(chassis.findAndDriveToBall(true),
-            pickup.getPickupCommand(), chassis.findAndDriveToBall(false), pickup.getPickupCommand(),
-            chassis.findAndDriveToBall(false), pickup.getPickupCommand());
-      }
+          // Red path
+          if (distanceToNearestBall * Math.cos(Math.toRadians(angleToNearestBall)) <= 140
+              * Constants.INCHES_TO_METERS) {
+            return SequentialCommandGroup.sequence(chassis.findAndDriveToBall(true),
+                chassis.findAndDriveToBall(false), chassis.findAndDriveToBall(false));
+          }
 
-      // Blue path
-      return SequentialCommandGroup.sequence(chassis.findAndDriveToBall(true),
-          pickup.getPickupCommand(), chassis.findAndDriveToBall(false), pickup.getPickupCommand(),
-          chassis.findAndDriveToBall(true), pickup.getPickupCommand());
-    });
+          // Blue path
+          return SequentialCommandGroup.sequence(chassis.findAndDriveToBall(true),
+              chassis.findAndDriveToBall(false), chassis.findAndDriveToBall(true));
+        }) /*, new ArmChange(ArmChange.Position.Top, pickup) */);
   }
 
   /**

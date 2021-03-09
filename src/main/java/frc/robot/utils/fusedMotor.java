@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /**
  * Add your docs here.
  */
-public class fusedMotor extends TalonSRX {
+public class FusedMotor extends TalonSRX {
     public static final double STUCK_CURRENT = 20;
     private static final int STUCK_CYCLES = 125;
     private static final int PAUSE_CYCLES = 40 + STUCK_CYCLES;
@@ -25,7 +25,7 @@ public class fusedMotor extends TalonSRX {
     double outputValue;
     ControlMode controlMode;
 
-    public fusedMotor(int id, String name) {
+    public FusedMotor(int id, String name) {
         super(id);
         this.name = name;
         stuckCycle = 0;

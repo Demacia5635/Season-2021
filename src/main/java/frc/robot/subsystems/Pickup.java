@@ -8,6 +8,8 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
+import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 
@@ -23,12 +25,14 @@ public class Pickup extends SubsystemBase {
   private WPI_TalonSRX armMotor;
   private PigeonIMU gyro;
 
-
   public Pickup() {
     pickupMotor = new WPI_TalonSRX(Constants.PICKUP_MOTOR_PORT);
     armMotor = new WPI_TalonSRX(Constants.ARM_MOTOR_PORT);
     armMotor.config_kP(0, Constants.ARM_KP);
     armMotor.configSelectedFeedbackCoefficient(360. / 800.);
+    armMotor.setInverted(true);
+    armMotor.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector,
+        LimitSwitchNormal.NormallyOpen);
     gyro = new PigeonIMU(pickupMotor);
     gyro.setFusedHeading(0);
     RobotContainer.gyro = gyro;
@@ -73,13 +77,31 @@ public class Pickup extends SubsystemBase {
     return new StartEndCommand(this::startPickup, this::stopPickup, this);
   }
 
+  public double getArmLimit(){
+    return armMotor.isRevLimitSwitchClosed();
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
   }
 
+  public void moveArm() {
+    armMotor.set(ControlMode.PercentOutput, 0.1);
+  }
+
+  public void stopArm(){
+    armMotor.set(ControlMode.PercentOutput, 0);
+  }
+
+  public StartEndCommand getarmMoveCommand(){
+    return new StartEndCommand(this::moveArm, this::stopArm, this);
+  }
+
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.addDoubleProperty("Arm Position", this::getArmPosition, null);
+    builder.addDoubleProperty("Arm Limit", this::getArmLimit, null);
+    armMotor.initSendable(builder);
   }
 }

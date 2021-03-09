@@ -7,6 +7,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean
@@ -30,9 +32,14 @@ public final class Constants {
     public static final int ARM_MOTOR_PORT = 5;
     public static final int PICKUP_MOTOR_PORT = 6;
 
-    public static final int SHOOTER_KS = -1;
-    public static final int HOOD_KP = -1;
-    public static final int ARM_KP = -1;
+    public static final double SHOOTER_KS = 1. / 11000.;
+    public static final double SHOOTER_KV = 0.09;
+    public static final double SHOOTER_KP = 0.001;
+    public static final double HOOD_KP = 0.1;
+    public static final double HOOD_KI = 0.01;
+    public static final double ARM_KP = -1;
+
+    public static final double ROULETTE_ROTATION_PER_SEC = 0.5;
 
     public static final int RIGHT_FRONT = 1;
     public static final int RIGHT_BACK = 2;
@@ -42,19 +49,20 @@ public final class Constants {
 
     public static final int XBOX_PORT = 0;
 
-    public static final double ROBOT_TRACK_WIDTH = 0.575; // In meters
+    public static final double ROBOT_TRACK_WIDTH = 0.59; // In meters
     public static final double MAX_VELOCITY = 2; // In meters per second
     public static final double MAX_RADIAL_ACCELARATION = 4; // In meters per squared second
     public static final double MAX_ANGULAR_VELOCITY = Math.PI; // In radians per second
 
     public static final double PULSES_PER_METER = 44700;
 
-        // TO DO: SET!!!
-        public static final int MOTION_S_CURVE = 3; // an integer between 0 - 8 that represents the
-        // velocity smoothing
-public static final double ACCELERATION = 10; // the acceletarion in sensor units per 100 ms
-public static final double CRUISE_VELOCITY = 5 * PULSES_PER_METER / 10; // the peak speed in sensor
-                                   // units per 100 ms
+    // TODO: SET!!!
+    public static final int MOTION_S_CURVE = 3; // an integer between 0 - 8 that represents the
+    // velocity smoothing
+    public static final double ACCELERATION = 10; // the acceletarion in sensor units per 100 ms
+    public static final double CRUISE_VELOCITY = 5 * PULSES_PER_METER / 10; // the peak speed in
+    // sensor
+    // units per 100 ms
 
     public static final double CHASSIS_KP = 0.01;
     public static final double CHASSIS_KI = 0;
@@ -62,4 +70,27 @@ public static final double CRUISE_VELOCITY = 5 * PULSES_PER_METER / 10; // the p
     public static final double CHASSIS_KS = 0.797;
     public static final double CHASSIS_KV = 2.54;
     public static final double CHASSIS_KA = 0.862;
+
+    /**
+     * Galactic Search
+     */
+    public static final double CHALLENGE_SPACE_WIDTH = 9.15;
+    public static final double CHALLENGE_SPACE_HEIGHT = 4.58;
+    public static final double MAX_AUTOMATION_VELOCITY = 4;
+    public static final double MAX_AUTOMATION_ACCELERATION = 2;
+
+    public static final double INCHES_TO_METERS = 0.0254;
+
+    /**
+     * AutoNav
+     */
+
+    // DifferentialDriveKinematics
+    public static final DifferentialDriveKinematics DRIVE_KINEMATICS =
+                                                                     new DifferentialDriveKinematics(
+                                                                             ROBOT_TRACK_WIDTH);
+
+    // Ramsete Parameters (in meters and seconds)
+    public static final double RAMSETE_B = 2;
+    public static final double RAMSETE_ZETA = 0.7;
 }

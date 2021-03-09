@@ -15,12 +15,17 @@ import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive; // import the diffrential drive
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 // some debugging power
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase; // import the base subsystem (which we extend)
 import frc.robot.Constants; // import all the measured constants
 import frc.robot.RobotContainer;
@@ -34,40 +39,31 @@ public class Chassis extends SubsystemBase {
   private GroupOfMotors right;
   private GroupOfMotors left;
   private PigeonIMU gyro;
-  private DifferentialDrive m_drive; // instance of the premade diffrential drive
-  private SpeedControllerGroup leftMotors; // a group which contains both left motors
-  private SpeedControllerGroup rightMotors; // a group which contains both right motors
   private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(
       Constants.CHASSIS_KS, Constants.CHASSIS_KV, Constants.CHASSIS_KA);
-  private DriveStates state;
+  private final Field2d field = new Field2d();
 
   /**
    * Creates a new Chassis.
    */
-  public Chassis(DriveStates dStates) {
-    state = dStates;
+  public Chassis() {
 
     WPI_TalonFX rightFront = new WPI_TalonFX(Constants.RIGHT_FRONT);
     WPI_TalonFX leftFront = new WPI_TalonFX(Constants.LEFT_FRONT);
     WPI_TalonFX rightBack = new WPI_TalonFX(Constants.RIGHT_BACK);
     WPI_TalonFX leftBack = new WPI_TalonFX(Constants.LEFT_BACK);
 
-    leftFront.setInverted(true);
-    leftBack.setInverted(true);
+    rightFront.setInverted(true);
+    rightBack.setInverted(true);
 
-    if (dStates == DriveStates.arcadeDrive || dStates == DriveStates.curvatureDrive) {
-      this.leftMotors = new SpeedControllerGroup(leftFront, leftBack);
-      this.rightMotors = new SpeedControllerGroup(rightFront, rightBack);
-      this.m_drive = new DifferentialDrive(this.leftMotors, this.rightMotors);
-      leftMotors.setInverted(true);
-    } else {
-      this.right = new GroupOfMotors(rightFront, rightBack);
-      this.left = new GroupOfMotors(leftFront, leftBack);
-      this.gyro = RobotContainer.gyro;
-      left.resetEncoder();
-      right.resetEncoder();
-    }
+    this.right = new GroupOfMotors(rightFront, rightBack);
+    this.left = new GroupOfMotors(leftFront, leftBack);
+    this.gyro = RobotContainer.gyro;
+    left.resetEncoder();
+    right.resetEncoder();
     m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getFusedHeading()));
+
+    SmartDashboard.putData("Field", field);
   }
 
   public void setVelocity(double left, double right) {
@@ -75,12 +71,12 @@ public class Chassis extends SubsystemBase {
     this.right.setVelocity(right, feedforward);
   }
 
-  public double getFusedHeading(){
-    if (gyro != null){
+  public double getFusedHeading() {
+    if (gyro != null) {
       return gyro.getFusedHeading();
     } else {
       gyro = RobotContainer.gyro;
-      if (gyro != null){
+      if (gyro != null) {
         return gyro.getFusedHeading();
       }
     }
@@ -180,24 +176,6 @@ public class Chassis extends SubsystemBase {
     setVelocity(left, right);
   }
 
-  public void arcadeDrive(double xSpeed, double zRotation, boolean squareInputs) {
-    // xSpeed - The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
-    // zRotation - The robot's rotation rate around the Z axis [-1.0..1.0].
-    // Clockwise is positive.
-    // squareInputs - If set, decreases the input sensitivity at low speeds.
-    this.m_drive.arcadeDrive(xSpeed, zRotation, squareInputs);
-  }
-
-  public void curvatureDrive(double xSpeed, double zRotation, boolean isQuickTurn) {
-    // xSpeed - The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
-    // zRotation - The robot's rotation rate around the Z axis [-1.0..1.0].
-    // Clockwise is positive.
-    // isQuickTurn - If set, overrides constant-curvature turning for turn-in-place
-    // maneuvers.
-
-    this.m_drive.curvatureDrive(xSpeed, zRotation, isQuickTurn);
-  }
-
   /**
    * Returns the currently-estimated pose of the robot.
    *
@@ -271,6 +249,22 @@ public class Chassis extends SubsystemBase {
     });
   }
 
+  /**
+   * Finds the nearest ball and drives to it.
+   * 
+   * @param isClockwise defines whether the robot would look for the ball by
+   *                    turning clockwise or counterclockwise.
+   * 
+   * @return the command that finds, and drives to the ball
+   */
+  public Command findAndDriveToBall(boolean isClockwise) {
+    return SequentialCommandGroup.sequence(new RunCommand(() -> {
+      setVelocity((isClockwise ? 1 : -1) * Constants.MAX_AUTOMATION_VELOCITY / 2,
+          (isClockwise ? -1 : 1) * Constants.MAX_AUTOMATION_VELOCITY / 2);
+    }, this).withInterrupt(() -> (SmartDashboard.getNumber("VisionAngle", 0) == 0)),
+        driveToBallCommand(Constants.MAX_AUTOMATION_VELOCITY));
+  }
+
   public void setPos(double pos1, double pos2) {
     this.left.setMotionMagic(pos1, this.feedforward, Constants.CRUISE_VELOCITY,
         Constants.ACCELERATION);
@@ -293,40 +287,24 @@ public class Chassis extends SubsystemBase {
     this.setPos2(this.left.getEncoder() + distance, this.right.getEncoder() + distance);
   }
 
-  public void configMotionMagic() {
-    this.left.setMotionSCurve(Constants.MOTION_S_CURVE);
-    this.left.setCruiseVelocity(Constants.CRUISE_VELOCITY);
-    this.left.setAcceleration(Constants.ACCELERATION);
-    this.right.setMotionSCurve(Constants.MOTION_S_CURVE);
-    this.right.setCruiseVelocity(Constants.CRUISE_VELOCITY);
-    this.right.setAcceleration(Constants.ACCELERATION);
+  public void configMotionMagic(double accelaration, double curve) {
+    for (GroupOfMotors motor : new GroupOfMotors[] { left, right }) {
+      motor.setMotionSCurve((int) curve);
+      motor.setCruiseVelocity(Constants.CRUISE_VELOCITY);
+      motor.setAcceleration(accelaration);
+    }
   }
 
-  public void configMotionMagic(double accelaration) {
-    this.left.setMotionSCurve(Constants.MOTION_S_CURVE);
-    this.left.setCruiseVelocity(Constants.CRUISE_VELOCITY);
-    this.left.setAcceleration(accelaration);
-    this.right.setMotionSCurve(Constants.MOTION_S_CURVE);
-    this.right.setCruiseVelocity(Constants.CRUISE_VELOCITY);
-    this.right.setAcceleration(accelaration);
+  public void configMotionMagic() {
+    configMotionMagic(Constants.ACCELERATION, Constants.MOTION_S_CURVE);
+  }
+
+  public void configMotionMagic(double acceleration) {
+    configMotionMagic(acceleration, Constants.MOTION_S_CURVE);
   }
 
   public void configMotionMagic(int curve) {
-    this.left.setMotionSCurve(curve);
-    this.left.setCruiseVelocity(Constants.CRUISE_VELOCITY);
-    this.left.setAcceleration(Constants.ACCELERATION);
-    this.right.setMotionSCurve(curve);
-    this.right.setCruiseVelocity(Constants.CRUISE_VELOCITY);
-    this.right.setAcceleration(Constants.ACCELERATION);
-  }
-
-  public void configMotionMagic(double accelaration, int curve) {
-    this.left.setMotionSCurve(curve);
-    this.left.setCruiseVelocity(Constants.CRUISE_VELOCITY);
-    this.left.setAcceleration(accelaration);
-    this.right.setMotionSCurve(curve);
-    this.right.setCruiseVelocity(Constants.CRUISE_VELOCITY);
-    this.right.setAcceleration(accelaration);
+    configMotionMagic(Constants.ACCELERATION, curve);
   }
 
   public double getPosLeft() {
@@ -340,17 +318,81 @@ public class Chassis extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    m_odometry.update(getRotation2d(), left.getDistance(), right.getDistance());
+    field.setRobotPose(m_odometry.getPoseMeters());
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
     // builder.addDoubleProperty(key, getter, setter);
-    if (state == DriveStates.angularVelocity || state == DriveStates.radialAccelaration) {
-      builder.addDoubleProperty("Left Distance", this::getLeftPos, null);
-      builder.addDoubleProperty("Right Distance", this::getRightPos, null);
-      builder.addDoubleProperty("Left Speed", this::getLeftVelocity, null);
-      builder.addDoubleProperty("Right Speed", this::getRightVelocity, null);
-    }
+    builder.addDoubleProperty("Left Distance", this::getLeftPos, null);
+    builder.addDoubleProperty("Right Distance", this::getRightPos, null);
+    builder.addDoubleProperty("Left Speed", this::getLeftVelocity, null);
+    builder.addDoubleProperty("Right Speed", this::getRightVelocity, null);
     builder.addDoubleProperty("Angle", this::getAngle, null);
   }
+
+  // public void setPower(int left, int right) {
+  // this.left.setPower(left);
+  // this.right.setPower(right);
+  // }
+  public void setPower(double left, double right) {
+    this.left.setPower(left);
+    this.right.setPower(right);
+  }
+
+  public double getRightDistance() {
+    return this.right.getDistance();
+  }
+
+  public double getLeftDistance() {
+    return this.left.getDistance();
+  }
+
+  public double getChassisDistance() {
+    return (this.getLeftDistance() + this.getRightDistance()) / 2;
+  }
+
+  /**
+   * 
+   * @param angle - an angle between 0 to 360
+   * 
+   * @return - return the angle between 180 to -180
+   */
+  public double normalizeAngle(double angle) {
+    return Math.IEEEremainder(angle, 360);
+  }
+
+  public double getNormalizedAngle() { // returns the angle of the robot between 180 to -180
+    return normalizeAngle(getAngle());
+  }
+
+  /**
+   * 
+   * @param reqAngle
+   * @param curAngle
+   * 
+   * @return returns the smallest delta between the angles
+   */
+  public double diffAngle(double reqAngle, double curAngle) { // returns the shortest angle to what
+                                                              // you want
+    double a1 = normalizeAngle(reqAngle) - normalizeAngle(curAngle);
+    if (a1 <= -180) {
+      return a1 + 360;
+    } else if (a1 > 180) {
+      return a1 - 360;
+    } else {
+      return a1;
+    }
+  }
+
+  public Rotation2d getRotation2d() {
+    return Rotation2d.fromDegrees(getAngle());
+  }
+
+  public double getAngle2Pose(Pose2d pose) {
+    Translation2d translation2d = pose.getTranslation().minus(getPose().getTranslation());
+    return new Rotation2d(translation2d.getX(), translation2d.getY()).getDegrees();
+  }
+
 }

@@ -7,6 +7,8 @@
 
 package frc.robot.utils;
 
+import java.util.Arrays;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.InvertType;
@@ -27,19 +29,10 @@ public class GroupOfMotors {
      * also configs the characteristics to those in the constants and sets them to
      * brake mode.
      * 
-     * @param talons - a group of device numbers for WPI_TalonFX talons
+     * @param ports - a group of device numbers for WPI_TalonFX talons
      */
-    public GroupOfMotors(int... talons) {
-        this.lead = new WPI_TalonFX(talons[0]);
-        this.lead.config_kP(0, Constants.CHASSIS_KP);
-        this.lead.config_kD(0, Constants.CHASSIS_KD);
-        this.lead.setNeutralMode(NeutralMode.Coast);
-        followers = new WPI_TalonFX[talons.length - 1];
-        for (int i = 0; i < followers.length; i++) {
-            followers[i] = new WPI_TalonFX(talons[i + 1]);
-            followers[i].setNeutralMode(NeutralMode.Coast);
-            followers[i].follow(lead);
-        }
+    public GroupOfMotors(int... ports) {
+        this(Arrays.stream(ports).mapToObj(port -> new WPI_TalonFX(port)).toArray(WPI_TalonFX[]::new));
     }
 
     /**
@@ -54,11 +47,11 @@ public class GroupOfMotors {
         this.lead = talons[0];
         this.lead.config_kP(0, Constants.CHASSIS_KP);
         this.lead.config_kD(0, Constants.CHASSIS_KD);
-        this.lead.setNeutralMode(NeutralMode.Coast);
+        this.lead.setNeutralMode(NeutralMode.Brake);
         followers = new WPI_TalonFX[talons.length - 1];
         for (int i = 0; i < followers.length; i++) {
             followers[i] = talons[i + 1];
-            followers[i].setNeutralMode(NeutralMode.Coast);
+            followers[i].setNeutralMode(NeutralMode.Brake);
             followers[i].follow(lead);
         }
     }
@@ -82,7 +75,7 @@ public class GroupOfMotors {
     public void setVelocity(double vel, SimpleMotorFeedforward aff) {// M/S
         double speed = (vel * Constants.PULSES_PER_METER / 10.);
         double a = vel - getVelocity();
-        double af = aff.calculate(vel, a);
+        double af = aff.calculate(vel, a) / 12;
         lead.set(ControlMode.Velocity, speed, DemandType.ArbitraryFeedForward, af);
     }
 

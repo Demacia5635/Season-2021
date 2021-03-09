@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase; // import the base subsyste
 import frc.robot.Constants; // import all the measured constants
 import frc.robot.RobotContainer;
 import frc.robot.commands.Drive.DriveStates;
+import frc.robot.utils.FeedForward;
 import frc.robot.utils.GroupOfMotors;
 
 public class Chassis extends SubsystemBase {
@@ -322,20 +323,6 @@ public class Chassis extends SubsystemBase {
     field.setRobotPose(m_odometry.getPoseMeters());
   }
 
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    // builder.addDoubleProperty(key, getter, setter);
-    builder.addDoubleProperty("Left Distance", this::getLeftPos, null);
-    builder.addDoubleProperty("Right Distance", this::getRightPos, null);
-    builder.addDoubleProperty("Left Speed", this::getLeftVelocity, null);
-    builder.addDoubleProperty("Right Speed", this::getRightVelocity, null);
-    builder.addDoubleProperty("Angle", this::getAngle, null);
-  }
-
-  // public void setPower(int left, int right) {
-  // this.left.setPower(left);
-  // this.right.setPower(right);
-  // }
   public void setPower(double left, double right) {
     this.left.setPower(left);
     this.right.setPower(right);
@@ -395,4 +382,19 @@ public class Chassis extends SubsystemBase {
     return new Rotation2d(translation2d.getX(), translation2d.getY()).getDegrees();
   }
 
+  public void setVelocityOurFF(double left, double right) {
+        this.left.setVelocity(left, FeedForward.feedForwardLeftPower(left, right));
+        this.right.setVelocity(left, FeedForward.feedForwardRightPower(left, right));
+  }
+
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    // builder.addDoubleProperty(key, getter, setter);
+    builder.addDoubleProperty("Left Distance", this::getLeftPos, null);
+    builder.addDoubleProperty("Right Distance", this::getRightPos, null);
+    builder.addDoubleProperty("Left Speed", this::getLeftVelocity, null);
+    builder.addDoubleProperty("Right Speed", this::getRightVelocity, null);
+    builder.addDoubleProperty("Angle", this::getAngle, null);
+  }
 }

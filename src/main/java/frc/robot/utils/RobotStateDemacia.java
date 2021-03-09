@@ -18,16 +18,16 @@ public class RobotStateDemacia {
 
     public RobotStateDemacia(Chassis chassis){
         this.angle = chassis.getAngle();
-        this.leftDis = chassis.getLeftDistance();
-        this.rightDis = chassis.getRightDistance();
+        this.leftDis = chassis.getLeftPos();
+        this.rightDis = chassis.getRightPos();
         this.pose = chassis.getPose();
         this.timeStep = System.currentTimeMillis();
         this.chassis = chassis;
     }
 
     public void compareAndPrint(){
-        double dL = chassis.getLeftDistance() - leftDis;
-        double dR = chassis.getRightDistance() - rightDis;
+        double dL = chassis.getLeftPos() - leftDis;
+        double dR = chassis.getRightPos() - rightDis;
         double dt = (System.currentTimeMillis() - timeStep)/1000.;
         System.out.println("_______________________________");
         System.out.println("time : " + dt);

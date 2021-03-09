@@ -56,7 +56,6 @@ public final class Constants {
 
     public static final double PULSES_PER_METER = 44700;
 
-    // TODO: SET!!!
     public static final int MOTION_S_CURVE = 3; // an integer between 0 - 8 that represents the
     // velocity smoothing
     public static final double ACCELERATION = 10; // the acceletarion in sensor units per 100 ms
@@ -64,12 +63,12 @@ public final class Constants {
     // sensor
     // units per 100 ms
 
-    public static final double CHASSIS_KP = 0.01;
+    public static final double CHASSIS_KP = 2.45;
     public static final double CHASSIS_KI = 0;
     public static final double CHASSIS_KD = 0;
-    public static final double CHASSIS_KS = 0.797;
-    public static final double CHASSIS_KV = 2.54;
-    public static final double CHASSIS_KA = 0.862;
+    public static final double CHASSIS_KS = 0.638;
+    public static final double CHASSIS_KV = 2.28;
+    public static final double CHASSIS_KA = 0.245;
 
     /**
      * Galactic Search

@@ -10,15 +10,12 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX; // import the tlaonFX
 import com.ctre.phoenix.sensors.PigeonIMU;
 
-import edu.wpi.first.wpilibj.SpeedControllerGroup; // import the speed control group type
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive; // import the diffrential drive
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-// some debugging power
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,10 +23,9 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.SubsystemBase; // import the base subsystem (which we extend)
-import frc.robot.Constants; // import all the measured constants
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.RobotContainer;
-import frc.robot.commands.Drive.DriveStates;
 import frc.robot.utils.FeedForward;
 import frc.robot.utils.GroupOfMotors;
 
@@ -275,26 +271,26 @@ public class Chassis extends SubsystemBase {
         driveToBallCommand(Constants.MAX_AUTOMATION_VELOCITY));
   }
 
-  public void setPos(double posLeft, double posRight) {
-    this.left.setMotionMagic(posLeft, this.feedforward, Constants.CRUISE_VELOCITY,
+  public void setPos(double leftPos, double rightPos) {
+    this.left.setMotionMagic(leftPos, this.feedforward, Constants.CRUISE_VELOCITY,
         Constants.ACCELERATION);
-    this.right.setMotionMagic(posLeft, this.feedforward, Constants.CRUISE_VELOCITY,
+    this.right.setMotionMagic(rightPos, this.feedforward, Constants.CRUISE_VELOCITY,
         Constants.ACCELERATION);
   }
 
-  public void setPos2(double posLeft, double posRight) {
-    this.left.setMotionMagic(posLeft);
-    this.right.setMotionMagic(posRight);
+  public void setPosWithoutFF(double leftPos, double rightPos) {
+    this.left.setMotionMagic(leftPos);
+    this.right.setMotionMagic(rightPos);
   }
 
   public void goTo(double distanceLeft, double distanceRight) {
     // this.configMotionMagic();
-    this.setPos2(this.left.getEncoder() + distanceLeft, this.right.getEncoder() + distanceRight);
+    this.setPosWithoutFF(this.left.getEncoder() + distanceLeft, this.right.getEncoder() + distanceRight);
   }
 
   public void goTo(double distance) {
     // this.configMotionMagic();
-    this.setPos2(this.left.getEncoder() + distance, this.right.getEncoder() + distance);
+    this.setPosWithoutFF(this.left.getEncoder() + distance, this.right.getEncoder() + distance);
   }
 
   public void configMotionMagic(double accelaration, double curve) {
@@ -317,14 +313,6 @@ public class Chassis extends SubsystemBase {
     configMotionMagic(Constants.ACCELERATION, curve);
   }
 
-  public double getPosLeft() {
-    return this.left.getEncoder();
-  }
-
-  public double getPoseRight() {
-    return this.right.getEncoder();
-  }
-
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -337,16 +325,8 @@ public class Chassis extends SubsystemBase {
     this.right.setPower(right);
   }
 
-  public double getRightDistance() {
-    return this.right.getDistance();
-  }
-
-  public double getLeftDistance() {
-    return this.left.getDistance();
-  }
-
   public double getChassisDistance() {
-    return (this.getLeftDistance() + this.getRightDistance()) / 2;
+    return (this.getLeftPos() + this.getRightPos()) / 2;
   }
 
   /**
@@ -396,10 +376,10 @@ public class Chassis extends SubsystemBase {
     this.right.setVelocity(left, FeedForward.feedForwardRightPower(left, right));
   }
 
-  public void setPosLeft(double distance) {
+  public void setLeftPos(double distance) {
     this.left.setPosition(distance);
   }
-  public void setPosRight(double distance) {
+  public void setRightPos(double distance) {
     this.right.setPosition(distance);
   }
 

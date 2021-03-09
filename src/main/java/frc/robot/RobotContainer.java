@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.Drive;
 import frc.robot.commands.Drive.DriveStates;
-import frc.robot.commands.Drive.InputHandler;
 import frc.robot.subsystems.Chassis;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Pickup;
@@ -33,7 +32,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final DriveStates dStates = DriveStates.arcadeDrive;
   private final Chassis chassis = new Chassis(dStates);
-  private final Drive driveCommand = new Drive(chassis, InputHandler.singer, dStates);
+  private final Drive driveCommand = new Drive(chassis, dStates);
   private final Climb climb = new Climb();
   private final Pickup pickup = new Pickup();
   private final Roulette roulette = new Roulette();

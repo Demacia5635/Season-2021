@@ -44,11 +44,11 @@ public class Turn extends CommandBase {
      *
      * @param subsystem The subsystem used by this command.
      */
-    public Turn(Chassis chassis, double angle) {
+    public Turn(Chassis chassis, double angle, XboxController controller) {
         this.chassis = chassis;
         // Use addRequirements() here to declare subsystem dependencies.
         this.angle = angle;
-        this.controller = new XboxController(Constants.XBOX_PORT);
+        this.controller = controller;
         addRequirements(chassis);
     }
 

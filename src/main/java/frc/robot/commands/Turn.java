@@ -43,7 +43,7 @@ public class Turn extends CommandBase {
         this.chassis = chassis;
         // Use addRequirements() here to declare subsystem dependencies.
         this.angle = angle;
-        distance = angle * (2 * Math.PI * Constants.ROBOT_TRACK_WIDTH) / 360;
+        distance = angle * (2 * Math.PI * Constants.ROBOT_TRACK_WIDTH) / 360.0;
         destination = (angle > 0 ? startPosRight : startPosLeft) - distance;
         addRequirements(chassis);
     }

@@ -9,25 +9,20 @@ package frc.robot.commands;
 
 import frc.robot.Constants;
 import frc.robot.subsystems.Chassis;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * An example command that uses an example subsystem.
  */
 public class Turn extends CommandBase {
+    private final double errorRange = 0.05; // In meters
+    private final double distance;
     private final Chassis chassis;
-    private double setPosLeft;
-    private double setPosRight;
+    private double startPosLeft;
+    private double startPosRight;
     private double angle;
-    private boolean forward; 
-    private XboxController controller;
 
     // according to the documentaion:
     // After gain/settings are determined,
@@ -43,34 +38,27 @@ public class Turn extends CommandBase {
      *
      * @param subsystem The subsystem used by this command.
      */
-    public Turn(Chassis chassis, double angle, XboxController controller) {
+    public Turn(Chassis chassis, double angle) {
         this.chassis = chassis;
         // Use addRequirements() here to declare subsystem dependencies.
         this.angle = angle;
-        this.controller = controller;
+        distance = angle * (2 * Math.PI * Constants.ROBOT_TRACK_WIDTH) / 360;
         addRequirements(chassis);
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        this.setPosLeft = chassis.getLeftPos();
-        this.setPosRight = chassis.getRightPos();
-        this.forward = controller.getY(Hand.kLeft) > 0.2; 
+        startPosLeft = chassis.getLeftPos();
+        startPosRight = chassis.getRightPos();
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        double distance = (angle * 2 * Math.PI * Constants.ROBOT_TRACK_WIDTH / 360); 
-        if (this.forward) {
-            if (this.angle > 0) this.chassis.setPosLeft(this.setPosLeft + distance); 
-            else this.chassis.setPosRight(this.setPosRight + distance); 
-        }
-        else {
-            if (this.angle > 0) this.chassis.setPosRight(this.setPosRight - distance); 
-            else this.chassis.setPosLeft(this.setPosLeft - distance); 
-        }
+        double distance = (angle * 2 * Math.PI * Constants.ROBOT_TRACK_WIDTH / 360);
+        if (angle > 0) chassis.setRightPos(startPosRight - distance);
+        else chassis.setLeftPos(startPosLeft - distance);
     }
 
     // Called once the command ends or is interrupted.
@@ -81,19 +69,11 @@ public class Turn extends CommandBase {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        double distance = (angle * 2 * Math.PI * Constants.ROBOT_TRACK_WIDTH / 360); 
-        if (this.forward) {
-            if (this.angle > 0) return this.chassis.getLeftPos() > 0.95 * (this.setPosLeft + distance)
-            && this.chassis.getLeftPos() < 1.05 * (this.setPosLeft + distance); 
-            else return this.chassis.getRightPos() > 0.95 * (this.setPosRight + distance)
-            && this.chassis.getRightPos() < 1.05 * (this.setPosRight + distance); 
-        }
-        else {
-            if (this.angle > 0) return this.chassis.getRightPos() > 0.95 * (this.setPosRight - distance)
-            && this.chassis.getRightPos() < 1.05 * (this.setPosRight - distance); 
-            else return this.chassis.getLeftPos() > 0.95 * (this.setPosLeft - distance)
-            && this.chassis.getLeftPos() < 1.05 * (this.setPosLeft - distance); 
-        }
+        return angle > 0
+                ? Math.abs(chassis.getRightPos() - (startPosRight - distance)) < errorRange
+                        * Constants.PULSES_PER_METER
+                : Math.abs(chassis.getLeftPos() - (startPosLeft - distance)) < errorRange
+                        * Constants.PULSES_PER_METER;
     }
 
     @Override

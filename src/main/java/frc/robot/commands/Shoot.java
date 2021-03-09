@@ -9,12 +9,15 @@ package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Shooting;
 
 public class Shoot extends CommandBase {
   private Shooting shooting;
   private DoubleSupplier velGetter, angleGetter;
+  private double angle;
+  private boolean up;
 
   public Shoot(Shooting shooting, DoubleSupplier velGetter, DoubleSupplier angleGetter) {
     this.velGetter = velGetter;
@@ -22,22 +25,25 @@ public class Shoot extends CommandBase {
     this.shooting = shooting;
   }
 
-  public static enum ShootType {
-    onClick, onHold
-  }
-
   @Override
   public void initialize() {
     shooting.stopBonk();
     shooting.setVacuum(false);
+    angle = angleGetter.getAsDouble();
+    up = angle > shooting.getHoodAngle();
   }
 
   @Override
   public void execute() {
-    //shooting.setHoodAngle(angleGetter.getAsDouble());
-    shooting.setWheelVel(velGetter.getAsDouble());
-    if (Math.abs(shooting.getWheelVel() - velGetter.getAsDouble()) <= 150
-        /*&& true/*Math.abs(shooting.getHoodAngle() - angleGetter.getAsDouble()) <= 0.1*/) {
+    if (up && shooting.getHoodAngle() < angle){
+      shooting.setHood(0.4 * Math.cos(Math.toRadians(shooting.getHoodAngle())));
+    }
+    else if (!up && shooting.getHoodAngle() > angle) shooting.setHood(0.4 * Math.cos(Math.toRadians(shooting.getHoodAngle())));
+    else shooting.setHood(0);
+
+    
+    if (/*Math.abs(*/velGetter.getAsDouble() - shooting.getWheelVel() /*)*/ <= 150
+        /*&& Math.abs(shooting.getHoodAngle() - angleGetter.getAsDouble()) <= 3*/) {
           if (shooting.getForwardSwitch() == 0){
             shooting.bonkUp();
           } else {
@@ -46,14 +52,16 @@ public class Shoot extends CommandBase {
           
           
         }
-        if (Math.abs(shooting.getWheelVel() - velGetter.getAsDouble()) <= 400){
+        if (/*Math.abs(*/ velGetter.getAsDouble() - shooting.getWheelVel() /*)*/ <= 400){
           shooting.setVacuum(true);
+          shooting.setWheelVel(velGetter.getAsDouble());
+        } else {
+          shooting.setWheel(1);
         }
   }
 
   @Override
   public void end(boolean interrupted) {
-    //shooting.setHoodAngle(0);
     shooting.setWheelVel(0);
     shooting.setVacuum(false);
     Bonk bonk = new Bonk(shooting, false);

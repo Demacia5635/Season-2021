@@ -15,6 +15,8 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -37,11 +39,14 @@ public class Shooting extends SubsystemBase {
     hoodMotor.setSensorPhase(true);
     hoodMotor.setInverted(true);
     bigWheel.setSensorPhase(true);
+    hoodMotor.configForwardSoftLimitThreshold(50 * 800 / 360);
+    hoodMotor.configForwardSoftLimitEnable(true);
     bigWheel.config_kP(0, Constants.SHOOTER_KP);
     hoodMotor.config_kP(0, Constants.HOOD_KP);
     hoodMotor.config_kI(0, Constants.HOOD_KI);
     hoodSwitchLastCycle = (int) getHoodLimit();
-
+    bigWheel.configContinuousCurrentLimit(20);
+    bigWheel.enableCurrentLimit(true);
     bonker.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector,
         LimitSwitchNormal.NormallyOpen);
     bonker.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector,
@@ -49,7 +54,8 @@ public class Shooting extends SubsystemBase {
     hoodMotor.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector,
         LimitSwitchNormal.NormallyOpen);
     vacuumState = false;
-    //setDefaultCommand(new RunCommand(this::getHoodBack, this));
+    
+    setDefaultCommand(new RunCommand(this::getHoodBack, this));
   }
 
   /**
@@ -70,11 +76,13 @@ public class Shooting extends SubsystemBase {
    * @param v In degrees/sec.
    */
   public void setWheelVel(double v) {
+    double feedforward = Constants.SHOOTER_KV + Constants.SHOOTER_KS * v;
+    if (v == 0){
+      feedforward = 0;
+    }
     bigWheel.set(ControlMode.Velocity, v / 10. * 800. / 360., DemandType.ArbitraryFeedForward,
-        Constants.SHOOTER_KV + Constants.SHOOTER_KS * v);
+        feedforward);
   }
-
-  
   
   public void bonkUp(){
     bonker.set(ControlMode.PercentOutput, 0.15);
@@ -86,6 +94,10 @@ public class Shooting extends SubsystemBase {
 
   public void stopBonk(){
     bonker.set(ControlMode.PercentOutput, 0.);
+  }
+
+   public void setHood(double percent){
+    hoodMotor.set(ControlMode.PercentOutput, percent);
   }
 
   /**
@@ -107,22 +119,32 @@ public class Shooting extends SubsystemBase {
     return bigWheel.getSelectedSensorVelocity() * 10. * 360. / 800.;
   }
 
-  public StartEndCommand getHoodCommand() {
-    return new StartEndCommand(this::setHoodOn, this::setHoodOff, this);
+  public RunCommand getHoodCommand() {
+    return new RunCommand(this::setHoodOn, this);
   }
 
   public void setHoodOn() {
     // setHoodAngle(10);
-    if (getHoodLimit() == 0) {
-      hoodMotor.set(ControlMode.PercentOutput, -0.2);
-    }
+    if (/*getHoodLimit() == 0*/ getHoodAngle() < 20 && getHoodAngle() < 50) {
+      hoodMotor.set(ControlMode.PercentOutput, 0.4);
+    } else {
+      setHoodOff();
+      System.out.println("stopped");
+    } 
 
+  }
+
+  public void setWheel(double percent){
+    bigWheel.set(ControlMode.PercentOutput, percent);
   }
 
   public void getHoodBack() {
     if (getHoodLimit() == 0) {
       hoodMotor.set(ControlMode.PercentOutput, -0.1);
-    }
+    } else {
+      System.out.println("stopped");
+      setHoodOff();
+    } 
   }
 
   public void setHoodOff() {

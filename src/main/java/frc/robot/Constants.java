@@ -32,8 +32,8 @@ public final class Constants {
     public static final int ARM_MOTOR_PORT = 5;
     public static final int PICKUP_MOTOR_PORT = 6;
 
-    public static final double SHOOTER_KS = 1. / 11000.;
-    public static final double SHOOTER_KV = 0.09;
+    public static final double SHOOTER_KS = 1. / 8000.;
+    public static final double SHOOTER_KV = 0.11;
     public static final double SHOOTER_KP = 0.001;
     public static final double HOOD_KP = 0.1;
     public static final double HOOD_KI = 0.01;

@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
@@ -24,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.ArmChange;
 import frc.robot.commands.Drive;
 import frc.robot.commands.*;
@@ -45,20 +47,22 @@ import frc.robot.subsystems.Shooting;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final XboxController mainController = new XboxController(Constants.XBOX_PORT);
+  private XboxController mainController;
+  private JoystickButton visionPickupButton;
   private final Chassis chassis = new Chassis();
   private final Drive driveCommand = new Drive(chassis, mainController);
   private final Climb climb = new Climb();
   private final Pickup pickup = new Pickup();
   private final Roulette roulette = new Roulette();
   private final Shooting shooting = new Shooting();
+  private JoystickButton shootButton;
   Shoot shoot;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    shoot = new Shoot(shooting, this::idk, this::idk);
+    shoot = new Shoot(shooting, this::getVel, this::getAngle);
     SmartDashboard.putData(chassis);
     SmartDashboard.putData(climb);
     SmartDashboard.putData(pickup);
@@ -78,7 +82,14 @@ public class RobotContainer {
    * it to a
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private void configureButtonBindings() {
+  private void configureButtonBindings() {/*
+    System.out.println("hi\n\n\n\n\n\n\n");
+    System.out.println(chassis.driveToBallCommand(0.5));*/
+    mainController = new XboxController(Constants.XBOX_PORT);
+    /*visionPickupButton = new JoystickButton(mainController, XboxController.Button.kA.value);
+    visionPickupButton.whenHeld(pickup.getPickupCommand().alongWith(chassis.driveToBallCommand(0.5)));*/
+    shootButton = new JoystickButton(mainController, XboxController.Button.kB.value);
+    shootButton.whenHeld(shoot);
   }
 
   /**
@@ -157,16 +168,21 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command[] getAutonomousCommands() {
-    return new Command[] { shoot, pickup.getPickupCommand() /*shooting.getHoodCommand()*/ /*getAutoNavCommand(), getGalacticSearchCommand(),
+    return new Command[] { /*shoot, pickup.getPickupCommand()*//*getAutoNavCommand(), getGalacticSearchCommand(),
     shooting.getshootercmd()*//* pickup.getPickupCommand()  new Bonk(shooting, true)*/ /*pickup.getarmMoveCommand()*/
     
   };
   }
-  public double idk(){
-    return 5000;
+
+  public double getAngle(){
+    return SmartDashboard.getNumber("ShootAngle", 5);
+  }
+
+  public double getVel(){
+    return SmartDashboard.getNumber("ShootVel", 4500);
   }
 
   public Command[] getTeleopCommands() {
-    return new Command[] { driveCommand };
+    return new Command[] { };
   }
 }

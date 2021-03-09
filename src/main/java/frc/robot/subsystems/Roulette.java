@@ -8,6 +8,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -30,7 +31,7 @@ public class Roulette extends SubsystemBase {
   }
 
   public void startSpin() {
-    roulette.set(ControlMode.Velocity, -40);
+    roulette.set(ControlMode.Velocity, -80, DemandType.ArbitraryFeedForward, -0.1);
   }
 
   public void stopSpin() {

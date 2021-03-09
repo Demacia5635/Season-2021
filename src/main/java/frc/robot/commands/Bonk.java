@@ -20,7 +20,9 @@ public class Bonk extends CommandBase {
 
   @Override
   public void initialize() {
-    shooting.setBonk(up ? 0.15 : -0.15);
+    if (up){
+      shooting.bonkUp();
+    } else shooting.bonkDown();
     count = 0;
   }
 
@@ -31,11 +33,13 @@ public class Bonk extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    shooting.setBonk(0);
+    shooting.stopBonk();
   }
 
   @Override
   public boolean isFinished() {
-    return (count >= 150);
+    if (up){
+      return shooting.getForwardSwitch() == 1;
+    } else return shooting.getReverseSwitch() == 1;
   }
 }

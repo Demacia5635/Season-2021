@@ -57,7 +57,7 @@ public class Turn extends CommandBase {
     public void initialize() {
         this.setPosLeft = chassis.getLeftPos();
         this.setPosRight = chassis.getRightPos();
-        this.forward = controller.getY(Hand.kLeft) > 0; 
+        this.forward = controller.getY(Hand.kLeft) > 0.2; 
     }
 
     // Called every time the scheduler runs while the command is scheduled.

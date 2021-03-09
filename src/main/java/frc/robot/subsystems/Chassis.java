@@ -339,8 +339,8 @@ public class Chassis extends SubsystemBase {
   }
 
   // public void setPower(int left, int right) {
-  //   this.left.setPower(left);
-  //   this.right.setPower(right);
+  // this.left.setPower(left);
+  // this.right.setPower(right);
   // }
   public void setPower(double left, double right) {
     this.left.setPower(left);
@@ -348,27 +348,28 @@ public class Chassis extends SubsystemBase {
   }
 
   public double getRightDistance() {
-    return this.right.getDistance(); 
+    return this.right.getDistance();
   }
 
   public double getLeftDistance() {
-    return this.left.getDistance(); 
+    return this.left.getDistance();
   }
 
   public double getChassisDistance() {
-    return (this.getLeftDistance() + this.getRightDistance()) / 2; 
+    return (this.getLeftDistance() + this.getRightDistance()) / 2;
   }
 
   /**
    * 
    * @param angle - an angle between 0 to 360
+   * 
    * @return - return the angle between 180 to -180
    */
-  public double normalizeAngle(double angle){ 
-	  return Math.IEEEremainder(angle, 360);
+  public double normalizeAngle(double angle) {
+    return Math.IEEEremainder(angle, 360);
   }
 
-  public double getNormalizedAngle(){ // returns the angle of the robot between 180 to -180
+  public double getNormalizedAngle() { // returns the angle of the robot between 180 to -180
     return normalizeAngle(getAngle());
   }
 
@@ -376,22 +377,31 @@ public class Chassis extends SubsystemBase {
    * 
    * @param reqAngle
    * @param curAngle
+   * 
    * @return returns the smallest delta between the angles
    */
-  public double diffAngle(double reqAngle, double curAngle){ // returns the shortest angle to what you want
+  public double diffAngle(double reqAngle, double curAngle) { // returns the shortest angle to what
+                                                              // you want
     double a1 = normalizeAngle(reqAngle) - normalizeAngle(curAngle);
     if (a1 <= -180) {
       return a1 + 360;
-    } else if(a1 > 180) {
+    } else if (a1 > 180) {
       return a1 - 360;
     } else {
       return a1;
     }
   }
 
-  public double getAngle2Pose(Pose2d pose){
+  public double getAngle2Pose(Pose2d pose) {
     Translation2d translation2d = pose.getTranslation().minus(getPose().getTranslation());
     return new Rotation2d(translation2d.getX(), translation2d.getY()).getDegrees();
+  }
+
+  public void startPosLeft(double distance) {
+    this.left.setPosition(distance);
+  }
+  public void startPosRight(double distance) {
+    this.right.setPosition(distance);
   }
 
 }

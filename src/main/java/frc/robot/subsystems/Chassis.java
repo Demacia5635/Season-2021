@@ -396,6 +396,13 @@ public class Chassis extends SubsystemBase {
     this.right.setVelocity(left, FeedForward.feedForwardRightPower(left, right));
   }
 
+  public void setPosLeft(double distance) {
+    this.left.setPosition(distance);
+  }
+  public void setPosRight(double distance) {
+    this.right.setPosition(distance);
+  }
+
   @Override
   public void initSendable(SendableBuilder builder) {
     // builder.addDoubleProperty(key, getter, setter);

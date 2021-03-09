@@ -28,7 +28,7 @@ public class Shoot extends CommandBase {
 
   @Override
   public void initialize() {
-    shooting.setBonk(0);
+    shooting.stopBonk();
     shooting.setVacuum(false);
   }
 
@@ -36,9 +36,17 @@ public class Shoot extends CommandBase {
   public void execute() {
     //shooting.setHoodAngle(angleGetter.getAsDouble());
     shooting.setWheelVel(velGetter.getAsDouble());
-    if (/*Math.abs(shooting.getWheelVel() - velGetter.getAsDouble()) <= 0.01
-        && true/*Math.abs(shooting.getHoodAngle() - angleGetter.getAsDouble()) <= 0.1*/true) {
-          shooting.setBonk(0.1);
+    if (Math.abs(shooting.getWheelVel() - velGetter.getAsDouble()) <= 150
+        /*&& true/*Math.abs(shooting.getHoodAngle() - angleGetter.getAsDouble()) <= 0.1*/) {
+          if (shooting.getForwardSwitch() == 0){
+            shooting.bonkUp();
+          } else {
+            shooting.stopBonk();
+          }
+          
+          
+        }
+        if (Math.abs(shooting.getWheelVel() - velGetter.getAsDouble()) <= 400){
           shooting.setVacuum(true);
         }
   }

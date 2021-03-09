@@ -15,7 +15,6 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -75,13 +74,18 @@ public class Shooting extends SubsystemBase {
         Constants.SHOOTER_KV + Constants.SHOOTER_KS * v);
   }
 
-  /**
-   * Sets the bonk's power.
-   * 
-   * @param percent Between 1 to -1.
-   */
-  public void setBonk(double percent) {
-    bonker.set(ControlMode.PercentOutput, percent);
+  
+  
+  public void bonkUp(){
+    bonker.set(ControlMode.PercentOutput, 0.15);
+  }
+
+  public void bonkDown(){
+    bonker.set(ControlMode.PercentOutput, -0.15);
+  }
+
+  public void stopBonk(){
+    bonker.set(ControlMode.PercentOutput, 0.);
   }
 
   /**
@@ -91,7 +95,7 @@ public class Shooting extends SubsystemBase {
    */
   public void setVacuum(boolean on) {
     if (vacuumState == on) return;
-    vacuumMotor.set(ControlMode.PercentOutput, on ? 0.7 : 0);
+    vacuumMotor.set(ControlMode.PercentOutput, on ? 1 : 0);
     vacuumState = on;
   }
 

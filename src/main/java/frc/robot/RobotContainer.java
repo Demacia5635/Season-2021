@@ -166,7 +166,7 @@ public class RobotContainer {
   };
   }
   public double idk(){
-    return 4000;
+    return 5000;
   }
 
   public Command[] getTeleopCommands() {

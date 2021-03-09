@@ -223,8 +223,8 @@ public class Chassis extends SubsystemBase {
    * @param speed - The velocity at which the robot will drive in Meters
    */
   public void driveToBall(double speed) {
-    double distance = SmartDashboard.getNumber("VisionDistance", 0);
-    double angle = SmartDashboard.getNumber("VisionAngle", 0);
+    double distance = SmartDashboard.getNumber("BallDistance", 0);
+    double angle = SmartDashboard.getNumber("BallAngle", 0);
     double radius = distance / (2 * Math.sin(angle * Math.PI / 180));
     double k = Constants.ROBOT_TRACK_WIDTH * 100 / 2;
     double left = speed * (1 + (k / radius));
@@ -246,7 +246,7 @@ public class Chassis extends SubsystemBase {
     }, (interrupted) -> {
       setVelocity(0, 0);
     }, () -> {
-      return SmartDashboard.getNumber("VisionDistance", 0) == 0;
+      return SmartDashboard.getNumber("BallDistance", 0) == 0;
     });
   }
 
@@ -262,7 +262,7 @@ public class Chassis extends SubsystemBase {
     return SequentialCommandGroup.sequence(new RunCommand(() -> {
       setVelocity((isClockwise ? 1 : -1) * Constants.MAX_AUTOMATION_VELOCITY / 2,
           (isClockwise ? -1 : 1) * Constants.MAX_AUTOMATION_VELOCITY / 2);
-    }, this).withInterrupt(() -> (SmartDashboard.getNumber("VisionAngle", 0) == 0)),
+    }, this).withInterrupt(() -> (SmartDashboard.getNumber("BallAngle", 0) == 0)),
         driveToBallCommand(Constants.MAX_AUTOMATION_VELOCITY));
   }
 

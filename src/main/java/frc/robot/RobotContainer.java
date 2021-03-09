@@ -118,8 +118,8 @@ public class RobotContainer {
   private Command getGalacticSearchCommand() {
     return SequentialCommandGroup.sequence(/*new ArmChange(ArmChange.Position.Bottom, pickup),*/
         pickup.getPickupCommand(), new SelectCommand(() -> {
-          double angleToNearestBall = SmartDashboard.getNumber("VisionAngle", 0);
-          double distanceToNearestBall = SmartDashboard.getNumber("VisionDistance", 0);
+          double angleToNearestBall = SmartDashboard.getNumber("BallAngle", 0);
+          double distanceToNearestBall = SmartDashboard.getNumber("BallDistance", 0);
 
           // Path A
           if (Math.abs(angleToNearestBall) <= 2) {

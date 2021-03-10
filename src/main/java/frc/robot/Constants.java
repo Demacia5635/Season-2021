@@ -63,12 +63,12 @@ public final class Constants {
     // sensor
     // units per 100 ms
 
-    public static final double CHASSIS_KP = 2.45;
+    public static final double CHASSIS_KP = 0.0000145;
     public static final double CHASSIS_KI = 0;
     public static final double CHASSIS_KD = 0;
     public static final double CHASSIS_KS = 0.638;
-    public static final double CHASSIS_KV = 2.28;
-    public static final double CHASSIS_KA = 0.245;
+    public static final double CHASSIS_KV = 1.09;
+    public static final double CHASSIS_KA = 0.118;
 
     /**
      * Galactic Search

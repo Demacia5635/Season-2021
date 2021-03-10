@@ -128,7 +128,6 @@ public class Shooting extends SubsystemBase {
       hoodMotor.set(ControlMode.PercentOutput, 0.4);
     } else {
       setHoodOff();
-      System.out.println("stopped");
     } 
 
   }
@@ -141,7 +140,6 @@ public class Shooting extends SubsystemBase {
     if (getHoodLimit() == 0) {
       hoodMotor.set(ControlMode.PercentOutput, -0.1);
     } else {
-      System.out.println("stopped");
       setHoodOff();
     } 
   }

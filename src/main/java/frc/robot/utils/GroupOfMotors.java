@@ -32,7 +32,8 @@ public class GroupOfMotors {
      * @param ports - a group of device numbers for WPI_TalonFX talons
      */
     public GroupOfMotors(int... ports) {
-        this(Arrays.stream(ports).mapToObj(port -> new WPI_TalonFX(port)).toArray(WPI_TalonFX[]::new));
+        this(Arrays.stream(ports).mapToObj(port -> new WPI_TalonFX(port))
+                .toArray(WPI_TalonFX[]::new));
     }
 
     /**
@@ -73,14 +74,14 @@ public class GroupOfMotors {
     }
 
     public void setVelocity(double vel, SimpleMotorFeedforward aff) {// M/S
-        double a = vel - getVelocity();
-        double af = aff.calculate(vel, a) / 12;
+        double a = (vel - getVelocity());
+        double af = aff.calculate(vel, a) / 12.;
         setVelocity(vel, af);
     }
 
     public void setVelocity(double vel, double aff) {
         lead.set(ControlMode.Velocity, vel * Constants.PULSES_PER_METER / 10.,
-                DemandType.ArbitraryFeedForward, aff);
+        DemandType.ArbitraryFeedForward, aff);
     }
 
     public void setPosition(double pos) {
@@ -88,7 +89,8 @@ public class GroupOfMotors {
     }
 
     public void setPosition(double pos, SimpleMotorFeedforward aff) {
-        this.lead.set(ControlMode.Position, pos * Constants.PULSES_PER_METER / 10., DemandType.ArbitraryFeedForward, aff.calculate(0.001));
+        this.lead.set(ControlMode.Position, pos * Constants.PULSES_PER_METER / 10.,
+                DemandType.ArbitraryFeedForward, aff.calculate(0.001));
     }
 
     public void setMotionMagic(double pos, SimpleMotorFeedforward aff, double maxSpeed,
@@ -101,7 +103,7 @@ public class GroupOfMotors {
 
     public void setMotionMagic(double pos) {
         // this.lead.set(ControlMode.MotionMagic, pos, DemandType.Neutral, 0);
-        this.lead.set(ControlMode.MotionMagic, pos);
+        this.lead.set(ControlMode.MotionMagic, pos, DemandType.AuxPID, 0);
     }
 
     public double getAccelForSpeed(double vel) {

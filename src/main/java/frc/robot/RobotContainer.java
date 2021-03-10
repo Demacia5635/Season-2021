@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.Drive;
 import frc.robot.commands.*;
 import frc.robot.subsystems.Chassis;
 import frc.robot.subsystems.Climb;
@@ -45,7 +44,7 @@ import frc.robot.subsystems.Shooting;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private XboxController mainController;
+  private XboxController mainController = new XboxController(Constants.XBOX_PORT);
   private JoystickButton visionPickupButton;
   private final Chassis chassis = new Chassis();
   private final Drive driveCommand = new Drive(chassis, mainController);
@@ -53,15 +52,15 @@ public class RobotContainer {
   private final Pickup pickup = new Pickup();
   private final Roulette roulette = new Roulette();
   private final Shooting shooting = new Shooting();
-  private Turn turn; 
   private JoystickButton shootButton;
   Shoot shoot;
+  public static PigeonIMU gyro;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    
+
     shoot = new Shoot(shooting, this::getVel, this::getAngle);
     SmartDashboard.putData(chassis);
     SmartDashboard.putData(climb);
@@ -70,10 +69,7 @@ public class RobotContainer {
     SmartDashboard.putData(shooting);
     // Configure the button bindings
     configureButtonBindings();
-    turn = new Turn(this.chassis, 3); 
   }
-
-  public static PigeonIMU gyro;
 
   /**
    * Use this method to define your button->command mappings. Buttons can be
@@ -83,14 +79,15 @@ public class RobotContainer {
    * it to a
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private void configureButtonBindings() {/*
-    System.out.println("hi\n\n\n\n\n\n\n");
-    System.out.println(chassis.driveToBallCommand(0.5));*/
-    mainController = new XboxController(Constants.XBOX_PORT);
-    /*visionPickupButton = new JoystickButton(mainController, XboxController.Button.kA.value);
-    visionPickupButton.whenHeld(pickup.getPickupCommand().alongWith(chassis.driveToBallCommand(0.5)));*/
-    shootButton = new JoystickButton(mainController, XboxController.Button.kB.value);
-    shootButton.whenHeld(shoot);
+  private void configureButtonBindings() {
+    /*
+     * visionPickupButton = new JoystickButton(mainController,
+     * XboxController.Button.kA.value);
+     * visionPickupButton.whenHeld(pickup.getPickupCommand().alongWith(chassis.
+     * driveToBallCommand(0.5)));
+     */
+    // shootButton = new JoystickButton(mainController, XboxController.Button.kB.value);
+    // shootButton.whenHeld(shoot);
   }
 
   /**
@@ -128,7 +125,7 @@ public class RobotContainer {
    * @return the Galactic Search command
    */
   private Command getGalacticSearchCommand() {
-    return SequentialCommandGroup.sequence(/*new ArmChange(ArmChange.Position.Bottom, pickup),*/
+    return SequentialCommandGroup.sequence(/* new ArmChange(ArmChange.Position.Bottom, pickup), */
         pickup.getPickupCommand(), new SelectCommand(() -> {
           double angleToNearestBall = SmartDashboard.getNumber("BallAngle", 0);
           double distanceToNearestBall = SmartDashboard.getNumber("BallDistance", 0);
@@ -160,19 +157,7 @@ public class RobotContainer {
           // Blue path
           return SequentialCommandGroup.sequence(chassis.findAndDriveToBall(true),
               chassis.findAndDriveToBall(false), chassis.findAndDriveToBall(true));
-        }) /*, new ArmChange(ArmChange.Position.Top, pickup) */);
-  }
-
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command[] getAutonomousCommands() {
-    return new Command[] { /*shoot, pickup.getPickupCommand()*//*getAutoNavCommand(), getGalacticSearchCommand(),
-    shooting.getshootercmd()*//* pickup.getPickupCommand()  new Bonk(shooting, true)*/ /*pickup.getarmMoveCommand()*/
-    
-  };
+        }) /* , new ArmChange(ArmChange.Position.Top, pickup) */);
   }
 
   public double getAngle(){
@@ -183,7 +168,18 @@ public class RobotContainer {
     return SmartDashboard.getNumber("ShootVel", 4500);
   }
 
+  /**
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   *
+   * @return the command to run in autonomous
+   */
+  public Command[] getAutonomousCommands() {
+    return new Command[] { 
+        new Turn(chassis, 10)
+     };
+  }
+
   public Command[] getTeleopCommands() {
-    return new Command[] { };
+    return new Command[] {driveCommand};
   }
 }

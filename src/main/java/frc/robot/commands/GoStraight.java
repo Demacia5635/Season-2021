@@ -20,6 +20,7 @@ public class GoStraight extends CommandBase {
   private double velocity;
   private double distance;
   private double minDis = 0, maxDis = 0;
+  private double errorRange = 0;
   private boolean stopAtEnd;
   private Chassis chassis;
   private RobotStateDemacia state;
@@ -55,8 +56,8 @@ public class GoStraight extends CommandBase {
     System.out.println("vel: " + velocity + "  distance: " + distance);
     state = new RobotStateDemacia(chassis);
     chassis.setVelocity(velocity, velocity);
-        minDis = chassis.getChassisDistance() + distance - 0.1;
-        maxDis = chassis.getChassisDistance() + distance + 0.1;
+        minDis = chassis.getChassisDistance() + distance - errorRange;
+        maxDis = chassis.getChassisDistance() + distance + errorRange;
         lastErr = 0;
         sumErr = 0;
     }
@@ -64,7 +65,7 @@ public class GoStraight extends CommandBase {
     @Override
     public void execute() {
         if (withAngle) {
-            double curAngle = chassis.getNormalizedAngle();
+            double curAngle = chassis.getAngle();
             double error = curAngle - angle;
             if (error > 180) {
                 error -= 360;
@@ -86,13 +87,13 @@ public class GoStraight extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         if (stopAtEnd) {
-            chassis.setPower(0, 0);
+            chassis.setVelocity(0, 0);
         }
         state.compareAndPrint();
     }
 
     @Override
     public boolean isFinished() {
-        return chassis.getChassisDistance() >= minDis && chassis.getChassisDistance() <= maxDis;
+        return chassis.getChassisDistance() >= minDis;
   }
 }

@@ -223,13 +223,9 @@ public class Chassis extends SubsystemBase {
     double angle = SmartDashboard.getNumber("BallAngle", 0);
     double difFromMid = 0.25;
     double lDistance = distance;
-    System.out.println("Angle Before = " + angle);
-    System.out.println("Distnce Before = " + distance);
     distance = Math.sqrt(Math.pow(distance, 2) + Math.pow(difFromMid, 2)
         - 2 * distance * difFromMid * Math.cos(Math.toRadians(-angle + 90)));
     angle = -((Math.PI / 2) - Math.asin(lDistance * Math.sin(Math.toRadians(-angle + 90)) / distance));
-    System.out.println("Angle After = " + Math.toDegrees(angle));
-    System.out.println("Distnce After = " + distance);
     double radius = distance / (2 * Math.sin(angle));
     double k = Constants.ROBOT_TRACK_WIDTH / 2;
     double left = speed * (1 + (k / radius));
@@ -388,6 +384,8 @@ public class Chassis extends SubsystemBase {
     // builder.addDoubleProperty(key, getter, setter);
     builder.addDoubleProperty("Left Distance", this::getLeftPos, null);
     builder.addDoubleProperty("Right Distance", this::getRightPos, null);
+    builder.addDoubleProperty("Left Encoder", this.left::getEncoder, null);
+    builder.addDoubleProperty("Right Encoder", this.right::getEncoder, null);
     builder.addDoubleProperty("Left Speed", this::getLeftVelocity, null);
     builder.addDoubleProperty("Right Speed", this::getRightVelocity, null);
     builder.addDoubleProperty("Angle", this::getAngle, null);

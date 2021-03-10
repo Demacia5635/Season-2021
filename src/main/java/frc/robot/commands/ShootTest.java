@@ -20,8 +20,8 @@ public class ShootTest extends CommandBase {
 
   @Override
   public void initialize() {
-    SmartDashboard.setDefaultNumber("Velocity for shooting", 1);
-    SmartDashboard.setDefaultNumber("Angle for shooting", 1);
+    SmartDashboard.setDefaultNumber("SVelocity", 4500);
+    SmartDashboard.setDefaultNumber("SAngle", 5);
     SmartDashboard.setDefaultBoolean("Shoot", false);
     SmartDashboard.setDefaultBoolean("Save", false);
   }
@@ -47,15 +47,15 @@ public class ShootTest extends CommandBase {
   }
 
   private double getVelocity(){
-    return SmartDashboard.getNumber("Velocity for shooting", 1);
+    return SmartDashboard.getNumber("SVelocity", 4500);
   }
 
   private double getAngle(){
-    return SmartDashboard.getNumber("Angle for shooting", 1);
+    return SmartDashboard.getNumber("SAngle", 5);
   }
 
   private void shoot() {
-    new Shoot(shooting, this::getVelocity, this::getAngle).withTimeout(10).schedule();
+    new Shoot(shooting, this::getVelocity, this::getAngle).withTimeout(15).schedule();
   }
 
   private void nextPos() {

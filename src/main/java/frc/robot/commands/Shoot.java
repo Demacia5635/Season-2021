@@ -9,8 +9,10 @@ package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Shooting;
+
 
 public class Shoot extends CommandBase {
   private Shooting shooting;
@@ -22,6 +24,8 @@ public class Shoot extends CommandBase {
     this.velGetter = velGetter;
     this.angleGetter = angleGetter;
     this.shooting = shooting;
+    SmartDashboard.putNumber("ShootVel", 4500);
+    SmartDashboard.putNumber("ShootAngle", 5);
   }
 
   @Override

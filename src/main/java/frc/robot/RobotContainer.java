@@ -53,6 +53,7 @@ public class RobotContainer {
   private final Pickup pickup = new Pickup();
   private final Roulette roulette = new Roulette();
   private final Shooting shooting = new Shooting();
+  private Turn turn; 
   private JoystickButton shootButton;
   Shoot shoot;
 
@@ -60,6 +61,7 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    
     shoot = new Shoot(shooting, this::getVel, this::getAngle);
     SmartDashboard.putData(chassis);
     SmartDashboard.putData(climb);
@@ -68,6 +70,7 @@ public class RobotContainer {
     SmartDashboard.putData(shooting);
     // Configure the button bindings
     configureButtonBindings();
+    turn = new Turn(this.chassis, 3); 
   }
 
   public static PigeonIMU gyro;

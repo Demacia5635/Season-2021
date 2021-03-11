@@ -31,7 +31,7 @@ public class Roulette extends SubsystemBase {
   }
 
   public void startSpin() {
-    roulette.set(ControlMode.Velocity, -30, DemandType.ArbitraryFeedForward, -0.1);
+    roulette.set(ControlMode.Velocity, -45, DemandType.ArbitraryFeedForward, -0.1);
   }
 
   public void stopSpin() {

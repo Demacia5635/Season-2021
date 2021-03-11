@@ -11,16 +11,15 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Chassis;
 import frc.robot.utils.RobotStateDemacia;
 
-
 public class GoStraight extends CommandBase {
   public static final double KP = 1. / 60.;
-  public static final double KI = 0; //KP / 10;
+  public static final double KI = 0; // KP / 10;
   public static final double KD = 0;
 
   private double velocity;
   private double distance;
   private double minDis = 0, maxDis = 0;
-  private double errorRange = 0;
+  private double errorRange = 0.01;
   private boolean stopAtEnd;
   private Chassis chassis;
   private RobotStateDemacia state;
@@ -29,71 +28,72 @@ public class GoStraight extends CommandBase {
   private double sumErr = 0;
   boolean withAngle = false;
 
-  
   public GoStraight(double velocity, double distance, Chassis chassis, boolean stopAtEnd) {
     this.velocity = velocity;
     this.distance = distance;
-    //this.velocity = SmartDashboard.getNumber("Velocity", 1);
-    //this.distance = SmartDashboard.getNumber("Distance", 1);
+    // this.velocity = SmartDashboard.getNumber("Velocity", 1);
+    // this.distance = SmartDashboard.getNumber("Distance", 1);
     this.chassis = chassis;
     this.stopAtEnd = stopAtEnd;
     System.out.println("Go Stright -  with=" + withAngle);
     addRequirements(chassis);
   }
 
-  public GoStraight(double velocity, double distance, double angle, Chassis chassis, boolean stopAtEnd){
+  public GoStraight(double velocity, double distance, double angle, Chassis chassis,
+      boolean stopAtEnd) {
     this(velocity, distance, chassis, stopAtEnd);
     this.angle = angle;
     withAngle = true;
     System.out.println("Go Stright - angle " + angle + " with=" + withAngle);
   }
 
-
   @Override
   public void initialize() {
-    //this.velocity = SmartDashboard.getNumber("Velocity", 1);
-    //this.distance = SmartDashboard.getNumber("Distance", 1);
+    // this.velocity = SmartDashboard.getNumber("Velocity", 1);
+    // this.distance = SmartDashboard.getNumber("Distance", 1);
     System.out.println("vel: " + velocity + "  distance: " + distance);
     state = new RobotStateDemacia(chassis);
-    chassis.setVelocity(velocity, velocity);
-        minDis = chassis.getChassisDistance() + distance - errorRange;
-        maxDis = chassis.getChassisDistance() + distance + errorRange;
-        lastErr = 0;
-        sumErr = 0;
-    }
+    chassis.setVelocityOurFF(velocity, velocity);
+    minDis = chassis.getChassisDistance() + Math.signum(velocity)*(distance - errorRange);
+    maxDis = chassis.getChassisDistance() + Math.signum(velocity)*(distance + errorRange);
+    System.out.println(minDis);
+    System.out.println(maxDis);
+    lastErr = 0;
+    sumErr = 0;
+  }
 
-    @Override
-    public void execute() {
-        if (withAngle) {
-            double curAngle = chassis.getAngle();
-            double error = curAngle - angle;
-            if (error > 180) {
-                error -= 360;
-            } else if (error < -180) {
-                error += 360;
-            }
-            sumErr += error;
-            double dE = error - lastErr;
-            double fix = KP * error + KI * sumErr + KD * dE;
-            double left = velocity + fix;
-            double right = velocity - fix;
-            lastErr = error;
-            chassis.setVelocity(left, right);
-            System.out.println("normAng: " + curAngle + " reqAngle: " + angle + " error: " + error
-                    + " left / right: " + left + " / " + right);
-        }
+  @Override
+  public void execute() {
+    if (withAngle) {
+      double curAngle = chassis.getAngle();
+      double error = curAngle - angle;
+      if (error > 180) {
+        error -= 360;
+      } else if (error < -180) {
+        error += 360;
+      }
+      sumErr += error;
+      double dE = error - lastErr;
+      double fix = KP * error + KI * sumErr + KD * dE;
+      double left = velocity + fix;
+      double right = velocity - fix;
+      lastErr = error;
+      chassis.setVelocityOurFF(left, right);
+      System.out.println("normAng: " + curAngle + " reqAngle: " + angle + " error: " + error
+          + " left / right: " + left + " / " + right);
     }
+  }
 
-    @Override
-    public void end(boolean interrupted) {
-        if (stopAtEnd) {
-            chassis.setVelocity(0, 0);
-        }
-        state.compareAndPrint();
+  @Override
+  public void end(boolean interrupted) {
+    if (stopAtEnd) {
+      chassis.setPower(0, 0);
     }
+    state.compareAndPrint();
+  }
 
-    @Override
-    public boolean isFinished() {
-        return chassis.getChassisDistance() >= minDis;
+  @Override
+  public boolean isFinished() {
+    return Math.abs(chassis.getChassisDistance()) >= Math.abs(minDis);
   }
 }

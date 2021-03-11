@@ -53,6 +53,7 @@ public class RobotContainer {
   private final Roulette roulette = new Roulette();
   private final Shooting shooting = new Shooting();
   private JoystickButton shootButton;
+  private JoystickButton collectButton;
   Shoot shoot;
   public static PigeonIMU gyro;
 
@@ -86,8 +87,11 @@ public class RobotContainer {
      * visionPickupButton.whenHeld(pickup.getPickupCommand().alongWith(chassis.
      * driveToBallCommand(0.5)));
      */
-    // shootButton = new JoystickButton(mainController, XboxController.Button.kB.value);
-    // shootButton.whenHeld(shoot);
+    collectButton = new JoystickButton(mainController, XboxController.Button.kA.value);
+    collectButton.whenHeld(pickup.getPickupCommand());
+    shootButton = new JoystickButton(mainController, XboxController.Button.kB.value);
+    shootButton.whenHeld(shoot);
+
   }
 
   /**
@@ -175,11 +179,11 @@ public class RobotContainer {
    */
   public Command[] getAutonomousCommands() {
     return new Command[] { 
-        new Turn(chassis, 10)
+      new GoStraight(-0.5, 2, chassis, true)
      };
   }
 
   public Command[] getTeleopCommands() {
-    return new Command[] {driveCommand};
+    return new Command[] {};
   }
 }

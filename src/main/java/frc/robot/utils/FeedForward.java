@@ -5,21 +5,21 @@
  */
 package frc.robot.utils;
 
-import frc.robot.Constants;
-
 /**
  *
  * @author Udi Kislev
  */
 public class FeedForward {
     
-    public static double K_HA = 8;
-    public static double K_LA = 0.29;
+    public static double K_HA = 6;
+    public static double K_LA = 0.25;
+    public static double K_S = 0.638/12; //0.22404
+    public static double K_V = 2.28/12; //0.04314
     public static double MAX_BRAKEMODE = 0.05;
     public static double MIN_BRAKEMODE = 0.1;
     
     public static double feedForwardPower(double velocity) {
-        return velocity * Constants.CHASSIS_KV + Constants.CHASSIS_KS;
+        return velocity * K_V + K_S;
     }
     
     public static double feedForwardLeftPower(double leftVelocity, double rightVelocity) {

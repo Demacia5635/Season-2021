@@ -84,11 +84,11 @@ public class Shooting extends SubsystemBase {
   }
   
   public void bonkUp(){
-    bonker.set(ControlMode.PercentOutput, 0.15);
+    bonker.set(ControlMode.PercentOutput, 0.1);
   }
 
   public void bonkDown(){
-    bonker.set(ControlMode.PercentOutput, -0.15);
+    bonker.set(ControlMode.PercentOutput, -0.07);
   }
 
   public void stopBonk(){

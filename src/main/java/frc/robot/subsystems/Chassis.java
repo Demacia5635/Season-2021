@@ -368,8 +368,8 @@ public class Chassis extends SubsystemBase {
   }
 
   public void setVelocityOurFF(double left, double right) {
-    this.left.setPower(FeedForward.feedForwardLeftPower(left, right));
-    this.right.setPower(FeedForward.feedForwardRightPower(left, right));
+    this.left.setVelocity(left, FeedForward.feedForwardLeftPower(left, right));
+    this.right.setVelocity(right, FeedForward.feedForwardRightPower(left, right));
   }
 
   public void setLeftPos(double distance) {

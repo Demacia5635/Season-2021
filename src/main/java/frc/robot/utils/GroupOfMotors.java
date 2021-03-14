@@ -150,6 +150,15 @@ public class GroupOfMotors {
     }
 
     /**
+     * 
+     * @param isBrake bake mode or coast
+     * Sets the motors neutral mode to either brake or coast
+     */
+    public void setNeutralMode(boolean isBrake) {
+        lead.setNeutralMode(isBrake ? NeutralMode.Brake : NeutralMode.Coast);
+    }
+
+    /**
      * If the S-Curve strength [0,8] is set to a nonzero value,
      * the generated velocity profile is no longer trapezoidal,
      * but instead is continuous (corner points are smoothed).

@@ -7,6 +7,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX; // import the tlaonFX
 import com.ctre.phoenix.sensors.PigeonIMU;
 
@@ -39,6 +40,7 @@ public class Chassis extends SubsystemBase {
   private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(
       Constants.CHASSIS_KS, Constants.CHASSIS_KV, Constants.CHASSIS_KA);
   private final Field2d field = new Field2d();
+  private boolean isBrake = true;
 
   /**
    * Creates a new Chassis.
@@ -58,6 +60,7 @@ public class Chassis extends SubsystemBase {
     this.gyro = RobotContainer.gyro;
     left.resetEncoder();
     right.resetEncoder();
+    setMotorNeutralMode(isBrake);
     m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getFusedHeading()));
 
     SmartDashboard.putData("Field", field);
@@ -379,6 +382,20 @@ public class Chassis extends SubsystemBase {
     this.right.setPosition(distance);
   }
 
+  public void setMotorNeutralMode(boolean isBrake) {
+    left.setNeutralMode(isBrake);
+    right.setNeutralMode(isBrake);
+  }
+
+  public void changeMotorsNeutralMode() {
+    isBrake = !isBrake;
+    setMotorNeutralMode(isBrake);
+  }
+
+  public boolean getIsMotorsNeutralModeBrake() {
+    return isBrake;
+  }
+
   @Override
   public void initSendable(SendableBuilder builder) {
     // builder.addDoubleProperty(key, getter, setter);
@@ -389,5 +406,6 @@ public class Chassis extends SubsystemBase {
     builder.addDoubleProperty("Left Speed", this::getLeftVelocity, null);
     builder.addDoubleProperty("Right Speed", this::getRightVelocity, null);
     builder.addDoubleProperty("Angle", this::getAngle, null);
+    builder.addBooleanProperty("Neutral Mode", this::getIsMotorsNeutralModeBrake, this::setMotorNeutralMode);
   }
 }

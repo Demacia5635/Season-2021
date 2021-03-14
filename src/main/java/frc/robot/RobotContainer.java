@@ -101,7 +101,7 @@ public class RobotContainer {
    * @return the AutoNav command
    */
   private Command getAutoNavCommand() {
-    final String trajectoryJSON = "paths/output/Test.wpilib.json";
+    final String trajectoryJSON = "paths/output/Slalom-mini.wpilib.json";
     Trajectory trajectory = new Trajectory();
 
     try {
@@ -113,7 +113,7 @@ public class RobotContainer {
 
     RamseteCommand cmd = new RamseteCommand(trajectory, chassis::getPose,
         new RamseteController(Constants.RAMSETE_B, Constants.RAMSETE_ZETA),
-        Constants.DRIVE_KINEMATICS, chassis::setVelocity, chassis);
+        Constants.DRIVE_KINEMATICS, chassis::setVelocityOurFF, chassis);
 
     chassis.resetOdometry(trajectory.getInitialPose());
 
@@ -179,7 +179,8 @@ public class RobotContainer {
    */
   public Command[] getAutonomousCommands() {
     return new Command[] { 
-      new GoStraight(-0.5, 2, chassis, true)
+      // new GoStraight(-0.5, 2, chassis, true)
+      getAutoNavCommand()
      };
   }
 

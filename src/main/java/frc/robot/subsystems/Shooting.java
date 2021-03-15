@@ -45,7 +45,7 @@ public class Shooting extends SubsystemBase {
     hoodMotor.config_kP(0, Constants.HOOD_KP);
     hoodMotor.config_kI(0, Constants.HOOD_KI);
     hoodSwitchLastCycle = (int) getHoodLimit();
-    bigWheel.configContinuousCurrentLimit(20);
+    bigWheel.configContinuousCurrentLimit(40);
     bigWheel.enableCurrentLimit(true);
     bonker.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector,
         LimitSwitchNormal.NormallyOpen);
@@ -81,6 +81,13 @@ public class Shooting extends SubsystemBase {
     double feedforward = Constants.SHOOTER_KV + Constants.SHOOTER_KS * v;
     if (v == 0){
       feedforward = 0;
+    }
+    else {
+      double vel = bigWheel.getSelectedSensorVelocity() * 3600. / 800.;
+      if (vel < v * .97){
+        double maintainPower = Constants.SHOOTER_KV + Constants.SHOOTER_KS * vel + 0.3;
+        if (maintainPower > feedforward) feedforward = maintainPower;
+      }
     }
     bigWheel.set(ControlMode.Velocity, v / 10. * 800. / 360., DemandType.ArbitraryFeedForward,
         feedforward);

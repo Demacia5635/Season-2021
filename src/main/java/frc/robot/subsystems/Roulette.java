@@ -12,15 +12,19 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Roulette extends SubsystemBase {
 
   private WPI_TalonSRX roulette;
+  private double rouletteVel;
 
   public Roulette() {
+    setRouletteVel(-30);
     roulette = new WPI_TalonSRX(Constants.ROULETTE_MOTOR_PORT);
     roulette.setSelectedSensorPosition(0);
     roulette.config_kP(0, 5);
@@ -31,7 +35,7 @@ public class Roulette extends SubsystemBase {
   }
 
   public void startSpin() {
-    roulette.set(ControlMode.Velocity, -45, DemandType.ArbitraryFeedForward, -0.1);
+    roulette.set(ControlMode.Velocity, rouletteVel, DemandType.ArbitraryFeedForward, -0.1);
   }
 
   public void stopSpin() {
@@ -41,12 +45,16 @@ public class Roulette extends SubsystemBase {
   /**
    * @return A StartEndCommand that starts the roulette's spin
    */
-  public StartEndCommand getSpinCommand() {
-    return new StartEndCommand(this::startSpin, this::stopSpin, this);
+  public Command getSpinCommand() {
+    return new RunCommand(this::startSpin,this).andThen(new InstantCommand(this::stopSpin));
   }
 
   public double getEncoder(){
     return roulette.getSelectedSensorPosition();
+  }
+
+  public void setRouletteVel(double vel){
+    rouletteVel = vel;
   }
 
   @Override
@@ -56,6 +64,8 @@ public class Roulette extends SubsystemBase {
   public void initSendable(SendableBuilder builder) {
     builder.addDoubleProperty("Encoder", this::getEncoder, null);
    //roulette.initSendable(builder);
+   builder.addDoubleProperty("Roulette Error", roulette::getClosedLoopError, null);
+   builder.addDoubleProperty("Roulette Power", roulette::get, null);
     
     //builder.addDoubleProperty("Velocity", this::, setter);
   }

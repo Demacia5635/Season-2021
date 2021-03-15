@@ -155,7 +155,11 @@ public class GroupOfMotors {
      * Sets the motors neutral mode to either brake or coast
      */
     public void setNeutralMode(boolean isBrake) {
-        lead.setNeutralMode(isBrake ? NeutralMode.Brake : NeutralMode.Coast);
+        NeutralMode mode = isBrake ? NeutralMode.Brake : NeutralMode.Coast;
+        lead.setNeutralMode(mode);
+        for (WPI_TalonFX follower : followers) {
+            follower.setNeutralMode(mode);
+        }
     }
 
     /**

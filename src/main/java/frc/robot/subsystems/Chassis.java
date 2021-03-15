@@ -383,13 +383,13 @@ public class Chassis extends SubsystemBase {
   }
 
   public void setMotorNeutralMode(boolean isBrake) {
+    this.isBrake = isBrake;
     left.setNeutralMode(isBrake);
     right.setNeutralMode(isBrake);
   }
 
   public void changeMotorsNeutralMode() {
-    isBrake = !isBrake;
-    setMotorNeutralMode(isBrake);
+    setMotorNeutralMode(!isBrake);
   }
 
   public boolean getIsMotorsNeutralModeBrake() {

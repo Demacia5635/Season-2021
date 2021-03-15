@@ -12,6 +12,7 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -53,6 +54,8 @@ public class Shooting extends SubsystemBase {
     hoodMotor.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector,
         LimitSwitchNormal.NormallyOpen);
     vacuumState = false;
+
+    bonker.setNeutralMode(NeutralMode.Brake);
     
     setDefaultCommand(new RunCommand(this::getHoodBack, this));
   }
@@ -84,11 +87,11 @@ public class Shooting extends SubsystemBase {
   }
   
   public void bonkUp(){
-    bonker.set(ControlMode.PercentOutput, 0.1);
+    bonker.set(ControlMode.PercentOutput, 0.17);
   }
 
   public void bonkDown(){
-    bonker.set(ControlMode.PercentOutput, -0.07);
+    bonker.set(ControlMode.PercentOutput, -0.1);
   }
 
   public void stopBonk(){
@@ -209,7 +212,7 @@ public class Shooting extends SubsystemBase {
     builder.addDoubleProperty("Bonk forward swtich", this::getForwardSwitch, null);
     builder.addDoubleProperty("Bonk reverse swtich", this::getReverseSwitch, null);
     builder.addDoubleProperty("Hood limit", this::getHoodLimit, null);
-    hoodMotor.initSendable(builder);
+    bonker.initSendable(builder);
   }
 
 }

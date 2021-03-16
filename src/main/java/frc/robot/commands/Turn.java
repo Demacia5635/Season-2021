@@ -53,6 +53,8 @@ public class Turn extends CommandBase {
     public void initialize() {
         startPosLeft = chassis.getLeftPos();
         startPosRight = chassis.getRightPos();
+        this.chassis.Set_K_I(0.1);
+  
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -65,6 +67,7 @@ public class Turn extends CommandBase {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
+        this.chassis.Set_K_I(Constants.CHASSIS_KI);
     }
 
     // Returns true when the command should end.

@@ -395,7 +395,12 @@ public class Chassis extends SubsystemBase {
   public boolean getIsMotorsNeutralModeBrake() {
     return isBrake;
   }
-
+  
+  public void Set_K_I(double ki) {
+    this.left.setK_I(ki);
+    this.right.setK_I(ki);
+  }
+  
   @Override
   public void initSendable(SendableBuilder builder) {
     // builder.addDoubleProperty(key, getter, setter);
@@ -408,4 +413,5 @@ public class Chassis extends SubsystemBase {
     builder.addDoubleProperty("Angle", this::getAngle, null);
     builder.addBooleanProperty("Neutral Mode", this::getIsMotorsNeutralModeBrake, this::setMotorNeutralMode);
   }
+
 }

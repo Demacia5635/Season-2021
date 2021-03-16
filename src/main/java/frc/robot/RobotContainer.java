@@ -185,7 +185,7 @@ public class RobotContainer {
   public Command[] getAutonomousCommands() {
     return new Command[] { 
       // new GoStraight(-0.5, 2, chassis, true)
-      getAutoNavCommand()
+      new Turn(chassis, 10)
      };
   }
 

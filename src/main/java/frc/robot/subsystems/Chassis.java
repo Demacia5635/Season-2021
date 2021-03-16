@@ -398,10 +398,16 @@ public class Chassis extends SubsystemBase {
   }
 
   public void setPosLeft(double distance) {
+
     this.left.setPosition(distance);
   }
   public void setPosRight(double distance) {
     this.right.setPosition(distance);
+  }
+
+  public void Set_K_I(double ki) {
+    this.left.setK_I(ki);
+    this.right.setK_I(ki);
   }
 
 }

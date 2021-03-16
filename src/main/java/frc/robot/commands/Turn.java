@@ -55,6 +55,7 @@ public class Turn extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+        this.chassis.Set_K_I(0.1);
         this.setPosLeft = chassis.getLeftPos();
         this.setPosRight = chassis.getRightPos();
         this.forward = controller.getY(Hand.kLeft) > 0.2; 
@@ -77,6 +78,7 @@ public class Turn extends CommandBase {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
+        this.chassis.Set_K_I(Constants.CHASSIS_KI);
     }
 
     // Returns true when the command should end.

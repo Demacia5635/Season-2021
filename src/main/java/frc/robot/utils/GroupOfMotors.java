@@ -112,7 +112,7 @@ public class GroupOfMotors {
 
     public void setMotionMagic(double pos) {
         // this.lead.set(ControlMode.MotionMagic, pos, DemandType.Neutral, 0);
-        this.lead.set(ControlMode.MotionMagic, pos);
+        this.lead.set(ControlMode.MotionMagic, pos);                
     }
 
     public double getAccelForSpeed(double vel) {

@@ -61,7 +61,7 @@ public class AutoShoot extends CommandBase {
    * @return The angle to the basket/hole.
    */
   private double getVisionAngle() {
-    return SmartDashboard.getNumber("Angle", -1);
+    return SmartDashboard.getNumber("Angle", 0);
   }
 
   /**
@@ -70,7 +70,7 @@ public class AutoShoot extends CommandBase {
    * @return The velocity of the big wheel.
    */
   private double getVel() {
-    int distance = (int) SmartDashboard.getNumber("Distance", -1);
+    int distance = (int) SmartDashboard.getNumber("Distance", 0);
     int distance1 = distance - distance % 50;
     int distance2 = distance1 + 50;
     double vel1 = dictionary.get(distance1)[0];
@@ -84,7 +84,7 @@ public class AutoShoot extends CommandBase {
    * @return The angle of the hood.
    */
   private double getAngle() {
-    int distance = (int) SmartDashboard.getNumber("Distance", -1);
+    int distance = (int) SmartDashboard.getNumber("Distance", 0);
     int distance1 = distance - distance % 50;
     int distance2 = distance1 + 50;
     double angle1 = dictionary.get(distance1)[1];

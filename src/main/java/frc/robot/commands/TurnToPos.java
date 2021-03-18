@@ -14,13 +14,19 @@ public class TurnToPos extends CommandBase {
   private Chassis chassis;
   private TurnType type;
   private DoubleSupplier angleGetter;
-  private double startAngle;
+  private Turn turnCommand;
 
   public TurnToPos(Chassis chassis, TurnType type, DoubleSupplier angleGetter) {
     this.chassis = chassis;
     this.type = type;
     this.angleGetter = angleGetter;
-    addRequirements(chassis);
+    switch (type){
+      case Passive:
+        addRequirements(chassis);
+        break;
+      default:
+        break;
+    }
   }
 
   public static enum TurnType {
@@ -29,11 +35,13 @@ public class TurnToPos extends CommandBase {
 
   @Override
   public void initialize() {
-    startAngle = chassis.getFusedHeading();
     switch (type) {
       case Passive:
-        // Turn by angle
+        chassis.setVelocity(1, -1);
         break;
+      case Active:
+        turnCommand = new Turn(chassis, angleGetter);
+        turnCommand.schedule();
       default:
         break;
     }
@@ -41,25 +49,26 @@ public class TurnToPos extends CommandBase {
 
   @Override
   public void execute() {
-    switch (type) {
-      case Active:
-        // Turn by angle
-        break;
-      default:
-        break;
-    }
   }
 
   @Override
   public void end(boolean interrupted) {
-    chassis.setVelocity(0, 0);
+    switch (type){
+      case Passive:
+        chassis.setVelocity(0, 0);
+        break;
+      case Active:
+        turnCommand.cancel();
+        break;
+    }
+    
   }
 
   @Override
   public boolean isFinished() {
     switch (type) {
       case Passive:
-        return Math.abs(angleGetter.getAsDouble()) <= 1;
+        return angleGetter.getAsDouble() != 0;
       default:
         return false;
     }

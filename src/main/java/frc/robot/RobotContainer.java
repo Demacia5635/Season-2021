@@ -106,7 +106,7 @@ public class RobotContainer {
    * @return the AutoNav command
    */
   private Command getAutoNavCommand() {
-    final String trajectoryJSON = "paths/output/Slalom-mini.wpilib.json";
+    final String trajectoryJSON = "paths/output/PartSlalom.wpilib.json";
     Trajectory trajectory = new Trajectory();
 
     try {
@@ -185,11 +185,12 @@ public class RobotContainer {
   public Command[] getAutonomousCommands() {
     return new Command[] { 
       // new GoStraight(-0.5, 2, chassis, true)
-      new Turn(chassis, 10)
+      // new TurnByVel(chassis, 4)
+      getAutoNavCommand()
      };
   }
 
   public Command[] getTeleopCommands() {
-    return new Command[] {};
+  return new Command[] {/*driveCommand*/};
   }
 }

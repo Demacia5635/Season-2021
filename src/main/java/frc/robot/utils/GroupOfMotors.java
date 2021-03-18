@@ -85,14 +85,28 @@ public class GroupOfMotors {
     }
 
     public void setPosition(double pos) {
-        this.lead.set(ControlMode.Position, pos * Constants.PULSES_PER_METER / 10.);
+        this.lead.set(ControlMode.Position, pos * Constants.PULSES_PER_METER);
     }
 
-    public void setPosition(double pos, SimpleMotorFeedforward aff) {
-        this.lead.set(ControlMode.Position, pos * Constants.PULSES_PER_METER / 10.,
-                DemandType.ArbitraryFeedForward, aff.calculate(0.001));
+    public void setPosition(double pos, double ff) {
+        this.lead.set(ControlMode.Position, pos * Constants.PULSES_PER_METER ,
+                DemandType.ArbitraryFeedForward, ff);
     }
 
+    public double getPower() {
+        return this.lead.getMotorOutputPercent();         
+    }
+    /**
+     * 
+     * @param error - in sensor units
+     */
+    public void setClosedLoopAllowedError(double error) {
+        this.lead.configAllowableClosedloopError(0, 150); 
+    }
+
+    public double getError() {
+        return this.lead.getClosedLoopError(); 
+    }
     public void setMotionMagic(double pos, SimpleMotorFeedforward aff, double maxSpeed,
             double acceleration) {
         // this.lead.set(ControlMode.MotionMagic, pos, DemandType.ArbitraryFeedForward,

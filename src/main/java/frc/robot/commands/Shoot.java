@@ -43,7 +43,7 @@ public class Shoot extends CommandBase {
       if (currAngle <= 3.5){
         shooting.setHood(0.5 * Math.cos(Math.toRadians(currAngle)));
       } else {
-        shooting.setHood(0.3 * Math.cos(Math.toRadians(currAngle)));
+        shooting.setHood(0.4 * Math.cos(Math.toRadians(currAngle)));
       }
       
     }

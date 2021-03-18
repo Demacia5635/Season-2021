@@ -17,13 +17,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * An example command that uses an example subsystem.
  */
 public class Turn extends CommandBase {
-    private final double errorRange = 0.05; // In meters
-    private final double destination; // In Pulses
+    private final double errorRange = 0.003; // In meters
+    private double destination; // In Pulses
     private final double distance;
     private final Chassis chassis;
     private double startPosLeft;
     private double startPosRight;
-    private double angle;
+    private final double angle;
 
     // according to the documentaion:
     // After gain/settings are determined,
@@ -42,9 +42,8 @@ public class Turn extends CommandBase {
     public Turn(Chassis chassis, double angle) {
         this.chassis = chassis;
         // Use addRequirements() here to declare subsystem dependencies.
-        this.angle = angle;
-        distance = angle * (2 * Math.PI * Constants.ROBOT_TRACK_WIDTH) / 360.0;
-        destination = (angle > 0 ? startPosRight : startPosLeft) - distance;
+        this.angle = angle; 
+        this.distance = Math.abs(angle) * (2 * Math.PI * Constants.ROBOT_TRACK_WIDTH) / 360.0;
         addRequirements(chassis);
     }
 
@@ -53,33 +52,54 @@ public class Turn extends CommandBase {
     public void initialize() {
         startPosLeft = chassis.getLeftPos();
         startPosRight = chassis.getRightPos();
-        this.chassis.Set_K_I(0.1);
-  
+        destination = (angle > 0 ? startPosRight : startPosLeft) - distance;
+        this.chassis.Set_K_I(0);
+        this.chassis.Set_K_D(0);
+        this.chassis.Set_K_P((Constants.CHASSIS_KV / 12) / 480 / 20);
+        this.chassis.setAllowedError(150);
+        if (angle > 0) {
+            chassis.setRightPos(destination, -Constants.CHASSIS_KV / 12);
+            chassis.setLeftPos(startPosLeft);
+        } 
+        else {
+            chassis.setLeftPos(destination, -Constants.CHASSIS_KV / 12);
+            chassis.setRightPos(startPosRight);
+        }
+        // 0.0145
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if (angle > 0) chassis.setRightPos(destination);
-        else chassis.setLeftPos(destination);
+    }
+
+    public double getDistance() {
+        return distance;
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
+        chassis.setPower(0, 0);
         this.chassis.Set_K_I(Constants.CHASSIS_KI);
+        this.chassis.Set_K_D(Constants.CHASSIS_KD);
+        this.chassis.Set_K_P(Constants.CHASSIS_KP);
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return angle > 0 ? Math.abs(chassis.getRightPos() - destination) < errorRange
-                : Math.abs(chassis.getLeftPos() - destination) < errorRange;
+        System.out.println("right pos " + chassis.getRightPos());
+        System.out.println("left pos " + chassis.getLeftPos());
+        System.out.println("diff " + Math.abs(chassis.getRightPos() - destination));
+
+        return angle > 0 ? chassis.getRightPos() - destination < errorRange
+                : chassis.getLeftPos() - destination < errorRange;
     }
 
     @Override
     public void initSendable(SendableBuilder builder) {
-
+        builder.addDoubleProperty("angle distance", this::getDistance, null);
     }
 
 }

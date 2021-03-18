@@ -24,7 +24,7 @@ public class Roulette extends SubsystemBase {
   private double rouletteVel;
 
   public Roulette() {
-    setRouletteVel(-30);
+    setRouletteVel(-25);
     roulette = new WPI_TalonSRX(Constants.ROULETTE_MOTOR_PORT);
     roulette.setSelectedSensorPosition(0);
     roulette.config_kP(0, 5);
@@ -35,7 +35,7 @@ public class Roulette extends SubsystemBase {
   }
 
   public void startSpin() {
-    roulette.set(ControlMode.Velocity, rouletteVel, DemandType.ArbitraryFeedForward, -0.1);
+    roulette.set(ControlMode.Velocity, rouletteVel, DemandType.ArbitraryFeedForward, Math.signum(rouletteVel) * 0.1);
   }
 
   public void stopSpin() {

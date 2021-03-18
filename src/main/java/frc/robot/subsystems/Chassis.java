@@ -173,7 +173,7 @@ public class Chassis extends SubsystemBase {
       right = -turns * (Constants.ROBOT_TRACK_WIDTH / 2);
       left = turns * (Constants.ROBOT_TRACK_WIDTH / 2);
     }
-    setVelocity(left, right);
+    setVelocityOurFF(left, right);
   }
 
   /**
@@ -382,6 +382,14 @@ public class Chassis extends SubsystemBase {
     this.right.setPosition(distance);
   }
 
+  public void setLeftPos(double distance, double feedforward) {
+    left.setPosition(distance, feedforward);
+  }
+
+  public void setRightPos(double distance, double feedforward) {
+    right.setPosition(distance, feedforward);
+  }
+
   public void setMotorNeutralMode(boolean isBrake) {
     this.isBrake = isBrake;
     left.setNeutralMode(isBrake);
@@ -400,7 +408,43 @@ public class Chassis extends SubsystemBase {
     this.left.setK_I(ki);
     this.right.setK_I(ki);
   }
-  
+
+  public void Set_K_D(double k_d) { 
+    this.left.setK_D(k_d);
+    this.right.setK_D(k_d);
+  }
+  public void Set_K_P(double k_p) { 
+    this.left.setK_P(k_p);
+    this.right.setK_P(k_p);
+  }
+  public double getLeftMotorOutput() {
+    return this.left.getPower(); 
+  }
+
+  public double getRightMotorOutput() {
+    return this.right.getPower(); 
+  }
+
+  public double getLeftClosedLoopError() {
+    return this.left.getError(); 
+  }
+
+  public double getRightClosedLoopError() {
+    return this.right.getError(); 
+  }
+
+  public void setRightAllowedError(double error) {
+    this.right.setClosedLoopAllowedError(error);
+  }
+  public void setLeftAllowedError(double error) {
+    this.left.setClosedLoopAllowedError(error);
+  }
+
+  public void setAllowedError(double error) {
+    this.setLeftAllowedError(error);
+    this.setRightAllowedError(error);
+  }
+
   @Override
   public void initSendable(SendableBuilder builder) {
     // builder.addDoubleProperty(key, getter, setter);
@@ -412,6 +456,9 @@ public class Chassis extends SubsystemBase {
     builder.addDoubleProperty("Right Speed", this::getRightVelocity, null);
     builder.addDoubleProperty("Angle", this::getAngle, null);
     builder.addBooleanProperty("Neutral Mode", this::getIsMotorsNeutralModeBrake, this::setMotorNeutralMode);
+    builder.addDoubleProperty("Left Motor power", this:: getLeftMotorOutput, null);
+    builder.addDoubleProperty("Right Motor power", this:: getRightMotorOutput, null);
+  
   }
 
 }

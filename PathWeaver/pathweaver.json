@@ -4,6 +4,6 @@
   "maxVelocity": 1.0,
   "maxAcceleration": 0.5,
   "wheelBase": 0.585,
-  "gameName": "Slalom Mini Path",
+  "gameName": "Slalom Path",
   "outputDir": "../src/main/deploy/paths"
 }

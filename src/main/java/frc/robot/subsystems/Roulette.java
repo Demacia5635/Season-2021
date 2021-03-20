@@ -24,7 +24,7 @@ public class Roulette extends SubsystemBase {
   private double rouletteVel;
 
   public Roulette() {
-    setRouletteVel(-25);
+    setRouletteVel(-20);
     roulette = new WPI_TalonSRX(Constants.ROULETTE_MOTOR_PORT);
     roulette.setSelectedSensorPosition(0);
     roulette.config_kP(0, 5);

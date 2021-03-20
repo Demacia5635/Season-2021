@@ -27,11 +27,15 @@ public class AutoShoot extends CommandBase {
 
   private HashMap<Integer, double[]> dictionary;
 
+  private final double[] velocities = new double[] { 5500, 3800, 3800, 3900, 4300, 4400, 5000, 5250,
+                                                     5500, 6000, 6200, 7300, 7800 };
+  private final double[] angles = new double[] {0, 0 , 2, 4, 5, 7, 9, 10, 11, 11, 11, 12, 13};
+
   public AutoShoot(Shooting shooting, Chassis chassis) {
     this.shooting = shooting;
     this.chassis = chassis;
-    dictionary = new HashMap<Integer, double[]>();
-    readFile();
+    //dictionary = new HashMap<Integer, double[]>();
+    //readFile();
   }
 
   @Override
@@ -61,7 +65,7 @@ public class AutoShoot extends CommandBase {
    * @return The angle to the basket/hole.
    */
   private double getVisionAngle() {
-    return SmartDashboard.getNumber("Angle", 0);
+    return shooting.getVisionAngle();
   }
 
   /**
@@ -70,12 +74,14 @@ public class AutoShoot extends CommandBase {
    * @return The velocity of the big wheel.
    */
   private double getVel() {
-    int distance = (int) SmartDashboard.getNumber("Distance", 0);
-    int distance1 = distance - distance % 50;
-    int distance2 = distance1 + 50;
-    double vel1 = dictionary.get(distance1)[0];
-    double vel2 = dictionary.get(distance2)[0];
-    return vel1 + ((distance - distance1) / 50.) * (vel2 - vel1);
+    double distance = (shooting.getVisionDistance() * 100. - 110.);
+    int distance1 = (int) ((distance - distance % 50) / 50);
+    int distance2 = distance1 + 1;
+    double vel1 = velocities[distance1];
+    double vel2 = velocities[distance2];
+    double vel = vel1 + ((distance % 50 / 50)) * (vel2 - vel1);
+    System.out.println(vel);
+    return vel;
   }
 
   /**
@@ -84,12 +90,15 @@ public class AutoShoot extends CommandBase {
    * @return The angle of the hood.
    */
   private double getAngle() {
-    int distance = (int) SmartDashboard.getNumber("Distance", 0);
-    int distance1 = distance - distance % 50;
-    int distance2 = distance1 + 50;
-    double angle1 = dictionary.get(distance1)[1];
-    double angle2 = dictionary.get(distance2)[1];
-    return angle1 + ((distance - distance1) / 50.) * (angle2 - angle1);
+    double distance = (shooting.getVisionDistance() * 100. - 110.);
+    int distance1 = (int) ((distance - distance % 50) / 50);
+    int distance2 = distance1 + 1;
+    System.out.println(distance1);
+    double angle1 = angles[distance1];
+    double angle2 = angles[distance2];
+    double angle = angle1 + ((distance % 50 / 50)) * (angle2 - angle1);
+    System.out.println(angle);
+    return angle;
   }
 
   /**
@@ -97,6 +106,7 @@ public class AutoShoot extends CommandBase {
    * transferrs it to an HashMap.
    */
   private void readFile() {
+    System.out.println("Got Here");
     firstTime = true;
     cycle = 0;
     int distance = -1;
@@ -111,13 +121,16 @@ public class AutoShoot extends CommandBase {
           if (cycle == 0) {
             distance = Integer.parseInt(value);
             cycle++;
+            System.out.println("Distance : " + value);
           } else if (cycle == 1) {
             velocity = Double.parseDouble(value);
             cycle++;
+            System.out.println("Velocity : " + value);
           } else {
             angle = Double.parseDouble(value);
             cycle = 0;
             dictionary.put(distance, new double[] { velocity, angle });
+            System.out.println("Angle : " + value);
           }
         } else if (firstTime && str.contains(":")) firstTime = false;
       }

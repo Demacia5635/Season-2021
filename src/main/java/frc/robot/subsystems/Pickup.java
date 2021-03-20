@@ -14,6 +14,10 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -29,13 +33,15 @@ public class Pickup extends SubsystemBase {
     pickupMotor = new WPI_TalonSRX(Constants.PICKUP_MOTOR_PORT);
     armMotor = new WPI_TalonSRX(Constants.ARM_MOTOR_PORT);
     armMotor.config_kP(0, Constants.ARM_KP);
-    armMotor.configSelectedFeedbackCoefficient(360. / 800.);
     armMotor.setInverted(true);
     armMotor.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector,
         LimitSwitchNormal.NormallyOpen);
     gyro = new PigeonIMU(pickupMotor);
     gyro.setFusedHeading(0);
     RobotContainer.gyro = gyro;
+    pickupMotor.configForwardSoftLimitThreshold(Constants.MAX_ARM_POS);
+    pickupMotor.configForwardSoftLimitEnable(true);
+    //setDefaultCommand(getarmMoveCommand());
   }
 
   /**
@@ -63,10 +69,10 @@ public class Pickup extends SubsystemBase {
   /**
    * Sets the angle of the arm motor.
    * 
-   * @param angle 0 is the starting position, positive means more down.
+   * @param power between 1 and -1.
    */
-  public void setArm(int angle) {
-    armMotor.set(ControlMode.Position, angle);
+  public void setArm(double power) {
+    armMotor.set(ControlMode.PercentOutput, power);
   }
 
   /**
@@ -84,18 +90,25 @@ public class Pickup extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    if (getArmLimit() == 1){
+      armMotor.setSelectedSensorPosition(0);
+    }
   }
 
   public void moveArm() {
-    armMotor.set(ControlMode.PercentOutput, 0.1);
+    armMotor.set(ControlMode.PercentOutput, 0.25);
   }
 
-  public void stopArm(){
+  public void stopArm(boolean a){
     armMotor.set(ControlMode.PercentOutput, 0);
   }
 
-  public StartEndCommand getarmMoveCommand(){
-    return new StartEndCommand(this::moveArm, this::stopArm, this);
+  private boolean rFalse(){
+    return false;
+  }
+
+  public Command getarmMoveCommand(){
+    return new FunctionalCommand(this::moveArm, this::moveArm,this::stopArm,this::rFalse , this);
   }
 
   @Override

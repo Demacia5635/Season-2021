@@ -14,7 +14,7 @@ public class TurnToPos extends CommandBase {
   private Chassis chassis;
   private TurnType type;
   private DoubleSupplier angleGetter;
-  private Turn turnCommand;
+  private TurnByVel turnCommand;
 
   public TurnToPos(Chassis chassis, TurnType type, DoubleSupplier angleGetter) {
     this.chassis = chassis;
@@ -40,7 +40,7 @@ public class TurnToPos extends CommandBase {
         chassis.setVelocity(1, -1);
         break;
       case Active:
-        turnCommand = new Turn(chassis, angleGetter);
+        turnCommand = new TurnByVel(chassis, angleGetter.getAsDouble());
         turnCommand.schedule();
       default:
         break;

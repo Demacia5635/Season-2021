@@ -15,7 +15,12 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import org.opencv.core.Mat;
+
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -29,6 +34,11 @@ public class Shooting extends SubsystemBase {
   private WPI_TalonSRX vacuumMotor;
   private int hoodSwitchLastCycle;
   private boolean vacuumState;// true if on, false if off
+  public double[] pixelToAngle = new double[] {0, 3.72, 7.12, 10.48, 14.03, 17.22, 20.55, 23.5, 26.56,
+                                                29.47, 32.00, 34.8, 37.23 };
+  private final int pxlDiff = 15;
+  private final double baseAngle = 38.6;
+  private final double targetHeight = 1.82;
 
   public Shooting() {
     bigWheel = new WPI_TalonSRX(Constants.SHOOTER_WHEEL_PORT);
@@ -56,7 +66,7 @@ public class Shooting extends SubsystemBase {
     vacuumState = false;
 
     bonker.setNeutralMode(NeutralMode.Brake);
-    
+
     setDefaultCommand(new RunCommand(this::getHoodBack, this));
   }
 
@@ -79,34 +89,57 @@ public class Shooting extends SubsystemBase {
    */
   public void setWheelVel(double v) {
     double feedforward = Constants.SHOOTER_KV + Constants.SHOOTER_KS * v;
-    if (v == 0){
+    double currentVel = getWheelVel();
+    if (v == 0) {
       feedforward = 0;
     }
-    else {
-      double vel = bigWheel.getSelectedSensorVelocity() * 3600. / 800.;
-      if (vel < v * .97){
-        double maintainPower = Constants.SHOOTER_KV + Constants.SHOOTER_KS * vel + 0.3;
-        if (maintainPower > feedforward) feedforward = maintainPower;
-      }
-    }
-    bigWheel.set(ControlMode.Velocity, v / 10. * 800. / 360., DemandType.ArbitraryFeedForward,
-        feedforward);
+    if (v - currentVel < 100) {
+      bigWheel.set(ControlMode.Velocity, v / 10. * 800. / 360., DemandType.ArbitraryFeedForward,
+          feedforward);
+    } else bigWheel.set(ControlMode.PercentOutput, 1);
   }
-  
-  public void bonkUp(){
+
+  public void bonkUp() {
     bonker.set(ControlMode.PercentOutput, 0.17);
   }
 
-  public void bonkDown(){
+  public void bonkDown() {
     bonker.set(ControlMode.PercentOutput, -0.1);
   }
 
-  public void stopBonk(){
+  public void stopBonk() {
     bonker.set(ControlMode.PercentOutput, 0.);
   }
 
-   public void setHood(double percent){
+  public void setHood(double percent) {
     hoodMotor.set(ControlMode.PercentOutput, percent);
+  }
+
+  public double getVisionAngle(){
+    int pixel = (int) SmartDashboard.getNumber("ShootingDiffX", -100);
+    if (pixel == -100) return -1000;
+    int sign = (int) Math.signum(pixel);
+    int pxl = Math.abs(pixel);
+    int index = pxl / pxlDiff;
+    double angle = pixelToAngle[index] + (pixelToAngle[index + 1] - pixelToAngle[index]) * (pxl % pxlDiff) / pxlDiff;
+    angle = angle * sign;
+    double visionDistance = getVisionDistance();
+    if (visionDistance != -1){
+      Translation2d v1 = new Translation2d(visionDistance, Rotation2d.fromDegrees(angle));
+      Translation2d v2 = new Translation2d(0.25, Rotation2d.fromDegrees(90));
+      Translation2d v3 = v1.minus(v2);
+      return Math.toDegrees(Math.atan(v3.getY() / v3.getX()));
+    }
+    else return -1000;
+  }
+
+  public double getVisionDistance(int pixel){
+    int sign = (int) Math.signum(pixel);
+    int pxl = Math.abs(pixel);
+    int index = pxl / pxlDiff;
+    double angle = pixelToAngle[index] + (pixelToAngle[index + 1] - pixelToAngle[index]) * (pxl % pxlDiff) / pxlDiff;
+    angle = angle * sign + baseAngle;
+    return targetHeight / (Math.tan(Math.toRadians(angle)));
   }
 
   /**
@@ -134,15 +167,15 @@ public class Shooting extends SubsystemBase {
 
   public void setHoodOn() {
     // setHoodAngle(10);
-    if (/*getHoodLimit() == 0*/ getHoodAngle() < 20 && getHoodAngle() < 50) {
+    if (/* getHoodLimit() == 0 */ getHoodAngle() < 20 && getHoodAngle() < 50) {
       hoodMotor.set(ControlMode.PercentOutput, 0.4);
     } else {
       setHoodOff();
-    } 
+    }
 
   }
 
-  public void setWheel(double percent){
+  public void setWheel(double percent) {
     bigWheel.set(ControlMode.PercentOutput, percent);
   }
 
@@ -151,7 +184,7 @@ public class Shooting extends SubsystemBase {
       hoodMotor.set(ControlMode.PercentOutput, -0.1);
     } else {
       setHoodOff();
-    } 
+    }
   }
 
   public void setHoodOff() {
@@ -208,6 +241,15 @@ public class Shooting extends SubsystemBase {
     setVacuum(false);
   }
 
+  public double getVisionDistance(){
+    int yPxl =  (int) SmartDashboard.getNumber("ShootingDiffY", 1000);
+    if (yPxl != -100){
+      return getVisionDistance(yPxl);
+    } else {
+      return -1;
+    }
+  }
+
   public StartEndCommand getshootercmd() {
     return new StartEndCommand(this::setWheelpower, this::stopWheel, this);
   }
@@ -220,6 +262,8 @@ public class Shooting extends SubsystemBase {
     builder.addDoubleProperty("Bonk reverse swtich", this::getReverseSwitch, null);
     builder.addDoubleProperty("Hood limit", this::getHoodLimit, null);
     bonker.initSendable(builder);
+    builder.addDoubleProperty("Vision Distance", this::getVisionDistance, null);
+    builder.addDoubleProperty("Vision Angle", this::getVisionAngle, null);
   }
 
 }

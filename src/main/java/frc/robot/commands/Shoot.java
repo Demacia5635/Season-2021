@@ -34,6 +34,7 @@ public class Shoot extends CommandBase {
     shooting.setVacuum(false);
     angle = angleGetter.getAsDouble();
     up = angle > shooting.getHoodAngle();
+    
   }
 
   @Override
@@ -41,9 +42,9 @@ public class Shoot extends CommandBase {
     double currAngle = shooting.getHoodAngle();
     if (up && currAngle < angle){
       if (currAngle <= 3.5){
-        shooting.setHood(0.5 * Math.cos(Math.toRadians(currAngle)));
+        shooting.setHood(0.5 * Math.cos(Math.toRadians(currAngle-15)));
       } else {
-        shooting.setHood(0.4 * Math.cos(Math.toRadians(currAngle)));
+        shooting.setHood(0.45 * Math.cos(Math.toRadians(currAngle-15)));
       }
       
     }

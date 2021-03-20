@@ -186,7 +186,7 @@ public class RobotContainer {
     return new Command[] { 
       // new GoStraight(-0.5, 2, chassis, true)
       // new TurnByVel(chassis, 4)
-      getAutoNavCommand()
+      new AutoShoot(shooting, chassis)
      };
   }
 

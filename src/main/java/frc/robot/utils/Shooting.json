@@ -1,1 +1,69 @@
-
+{
+    "Positions" : [
+        {
+            "Distance" : "0",
+            "Velocity" : "5500",
+            "Angle" : "0"
+        },
+        {
+            "Distance" : "50",
+            "Velocity" : "3800",
+            "Angle" : "0"
+        },
+        {
+            "Distance" : "100",
+            "Velocity" : "3800",
+            "Angle" : "2"
+        },
+        {
+            "Distance" : "150",
+            "Velocity" : "3900",
+            "Angle" : "4"
+        },
+        {
+            "Distance" : "200",
+            "Velocity" : "4300",
+            "Angle" : "5"
+        },
+        {
+            "Distance" : "250",
+            "Velocity" : "4400",
+            "Angle" : "7"
+        },
+        {
+            "Distance" : "300",
+            "Velocity" : "5000",
+            "Angle" : "9"
+        },
+        {
+            "Distance" : "350",
+            "Velocity" : "5250",
+            "Angle" : "10"
+        },
+        {
+            "Distance" : "400",
+            "Velocity" : "5500",
+            "Angle" : "11"
+        },
+        {
+            "Distance" : "450",
+            "Velocity" : "6000",
+            "Angle" : "11"
+        },
+        {
+            "Distance" : "500",
+            "Velocity" : "6200",
+            "Angle" : "11"
+        },
+        {
+            "Distance" : "550",
+            "Velocity" : "7300",
+            "Angle" : "12"
+        },
+        {
+            "Distance" : "600",
+            "Velocity" : "7800",
+            "Angle" : "13"
+        }
+    ]
+}

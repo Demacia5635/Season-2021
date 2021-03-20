@@ -35,7 +35,7 @@ public final class Constants {
 
     public static final double SHOOTER_KS = 1. / 10900.;
     public static final double SHOOTER_KV = 0.09;
-    public static final double SHOOTER_KP = 0.03;
+    public static final double SHOOTER_KP = 0.05;
     public static final double HOOD_KP = 0.1;
     public static final double HOOD_KI = 0.01;
     public static final double ARM_KP = -1;
@@ -54,6 +54,8 @@ public final class Constants {
     public static final double MAX_VELOCITY = 2; // In meters per second
     public static final double MAX_RADIAL_ACCELARATION = 4; // In meters per squared second
     public static final double MAX_ANGULAR_VELOCITY = Math.PI; // In radians per second
+
+    public static final int MAX_ARM_POS = 150;
 
     public static final double PULSES_PER_METER = 44700;
 

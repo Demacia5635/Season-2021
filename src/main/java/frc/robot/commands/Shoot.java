@@ -40,6 +40,7 @@ public class Shoot extends CommandBase {
   @Override
   public void execute() {
     double currAngle = shooting.getHoodAngle();
+    angle = angleGetter.getAsDouble();
     if (up && currAngle < angle){
       if (currAngle <= 3.5){
         shooting.setHood(0.5 * Math.cos(Math.toRadians(currAngle-15)));

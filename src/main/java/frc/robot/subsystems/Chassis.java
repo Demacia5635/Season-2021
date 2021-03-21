@@ -224,15 +224,19 @@ public class Chassis extends SubsystemBase {
   public void driveToBall(double speed) {
     double distance = SmartDashboard.getNumber("BallDistance", 0) / 100.0;
     double angle = SmartDashboard.getNumber("BallAngle", 0);
-    double difFromMid = 0.25;
+    angle = angle + 6.1155;
+    double difFromMid = 0.15;
     double lDistance = distance;
     distance = Math.sqrt(Math.pow(distance, 2) + Math.pow(difFromMid, 2)
         - 2 * distance * difFromMid * Math.cos(Math.toRadians(-angle + 90)));
-    angle = -((Math.PI / 2) - Math.asin(lDistance * Math.sin(Math.toRadians(-angle + 90)) / distance));
+    //angle = -((Math.PI / 2) - Math.asin(lDistance * Math.sin(Math.toRadians(-angle + 90)) / distance));
+    angle = Math.toRadians(angle) - Math.acos((Math.pow(difFromMid, 2) - Math.pow(lDistance, 2) - Math.pow(distance, 2)) / (-2 * distance * lDistance));
     double radius = distance / (2 * Math.sin(angle));
     double k = Constants.ROBOT_TRACK_WIDTH / 2;
     double left = speed * (1 + (k / radius));
     double right = speed * (1 - (k / radius));
+    System.out.println(left);
+    System.out.println(right);
     setVelocity(left, right);
   }
 

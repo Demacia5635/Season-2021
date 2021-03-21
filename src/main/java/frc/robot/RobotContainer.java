@@ -83,18 +83,16 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    /*
-     * visionPickupButton = new JoystickButton(mainController,
-     * XboxController.Button.kA.value);
-     * visionPickupButton.whenHeld(pickup.getPickupCommand().alongWith(chassis.
-     * driveToBallCommand(0.5)));
-     */
+    visionPickupButton = new JoystickButton(mainController, XboxController.Button.kA.value);
+    visionPickupButton
+        .whenHeld(pickup.getPickupCommand().alongWith(chassis.driveToBallCommand(0.5)));
     revRouletteButton = new JoystickButton(mainController, XboxController.Button.kBack.value);
     revRouletteButton.whenPressed(new InstantCommand(() -> roulette.setRouletteVel(30)));
     revRouletteButton.whenReleased(new InstantCommand(() -> roulette.setRouletteVel(-30)));
-    collectButton = new JoystickButton(mainController, XboxController.Button.kA.value);
+    collectButton = new JoystickButton(mainController, XboxController.Button.kX.value);
     collectButton.whenHeld(pickup.getPickupCommand());
-    shootButton = new JoystickButton(mainController, XboxController.Button.kB.value);
+    shootButton = new JoystickButton(mainController,
+    XboxController.Button.kB.value);
     shootButton.whenHeld(shoot);
 
   }
@@ -169,11 +167,11 @@ public class RobotContainer {
         }) /* , new ArmChange(ArmChange.Position.Top, pickup) */);
   }
 
-  public double getAngle(){
+  public double getAngle() {
     return SmartDashboard.getNumber("ShootAngle", 5);
   }
 
-  public double getVel(){
+  public double getVel() {
     return SmartDashboard.getNumber("ShootVel", 4500);
   }
 
@@ -183,14 +181,12 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command[] getAutonomousCommands() {
-    return new Command[] { 
-      // new GoStraight(-0.5, 2, chassis, true)
-      // new TurnByVel(chassis, 4)
-      new AutoShoot(shooting, chassis)
-     };
+    return new Command[] {
+        pickup.getarmMoveCommand()
+    };
   }
 
   public Command[] getTeleopCommands() {
-  return new Command[] {/*driveCommand*/};
+    return new Command[] { driveCommand };
   }
 }

@@ -262,8 +262,8 @@ public class Shooting extends SubsystemBase {
     builder.addDoubleProperty("Bonk reverse swtich", this::getReverseSwitch, null);
     builder.addDoubleProperty("Hood limit", this::getHoodLimit, null);
     bonker.initSendable(builder);
-    builder.addDoubleProperty("Vision Distance", this::getVisionDistance, null);
-    builder.addDoubleProperty("Vision Angle", this::getVisionAngle, null);
+    // builder.addDoubleProperty("Vision Distance", this::getVisionDistance, null);
+    // builder.addDoubleProperty("Vision Angle", this::getVisionAngle, null);
   }
 
 }

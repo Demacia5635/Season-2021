@@ -39,8 +39,8 @@ public class Pickup extends SubsystemBase {
     gyro = new PigeonIMU(pickupMotor);
     gyro.setFusedHeading(0);
     RobotContainer.gyro = gyro;
-    pickupMotor.configForwardSoftLimitThreshold(Constants.MAX_ARM_POS);
-    pickupMotor.configForwardSoftLimitEnable(true);
+    armMotor.configForwardSoftLimitThreshold(Constants.MAX_ARM_POS);
+    armMotor.configForwardSoftLimitEnable(true);
     //setDefaultCommand(getarmMoveCommand());
   }
 
@@ -96,7 +96,7 @@ public class Pickup extends SubsystemBase {
   }
 
   public void moveArm() {
-    armMotor.set(ControlMode.PercentOutput, 0.25);
+    armMotor.set(ControlMode.PercentOutput, 0.7 * (1 - (getArmPosition() / 170.)));
   }
 
   public void stopArm(boolean a){

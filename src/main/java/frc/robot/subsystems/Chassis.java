@@ -366,7 +366,7 @@ public class Chassis extends SubsystemBase {
   }
 
   public Rotation2d getRotation2d() {
-    return Rotation2d.fromDegrees(getAngle());
+    return Rotation2d.fromDegrees(gyro.getFusedHeading());//getAngle());
   }
 
   public double getAngle2Pose(Pose2d pose) {
@@ -396,8 +396,8 @@ public class Chassis extends SubsystemBase {
 
   public void setMotorNeutralMode(boolean isBrake) {
     this.isBrake = isBrake;
-    left.setNeutralMode(isBrake);
-    right.setNeutralMode(isBrake);
+    left.setNeutralMode(!isBrake);
+    right.setNeutralMode(!isBrake);
   }
 
   public void changeMotorsNeutralMode() {
@@ -449,6 +449,14 @@ public class Chassis extends SubsystemBase {
     this.setRightAllowedError(error);
   }
 
+  public double getX(){
+    return getPose().getX();
+  }
+  
+  public double getY(){
+    return getPose().getY();
+  }
+
   @Override
   public void initSendable(SendableBuilder builder) {
     // builder.addDoubleProperty(key, getter, setter);
@@ -462,6 +470,10 @@ public class Chassis extends SubsystemBase {
     builder.addBooleanProperty("Neutral Mode", this::getIsMotorsNeutralModeBrake, this::setMotorNeutralMode);
     builder.addDoubleProperty("Left Motor power", this:: getLeftMotorOutput, null);
     builder.addDoubleProperty("Right Motor power", this:: getRightMotorOutput, null);
+    builder.addDoubleProperty("Pose X", this::getX, null);
+    builder.addDoubleProperty("Pose Y", this::getY, null);
+    
+
   
   }
 

@@ -53,7 +53,8 @@ public class FeedForward {
     }
     
     private static double power(double highVelocity, double lowVelocity, boolean high) {
-        double v = (highVelocity - lowVelocity + highVelocity*K_HA - lowVelocity*K_LA) / (K_HA - K_LA);
+        // double v = (highVelocity - lowVelocity + highVelocity*K_HA - lowVelocity*K_LA) / (K_HA - K_LA);
+        double v = highVelocity + lowVelocity*K_LA / (K_HA - K_LA);
         double p = feedForwardPower(v);
         if(high) {
             return p;

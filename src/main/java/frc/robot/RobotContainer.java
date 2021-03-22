@@ -58,6 +58,7 @@ public class RobotContainer {
   private JoystickButton revRouletteButton;
   Shoot shoot;
   public static PigeonIMU gyro;
+  private Command autCommand;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -72,6 +73,8 @@ public class RobotContainer {
     SmartDashboard.putData(shooting);
     // Configure the button bindings
     configureButtonBindings();
+
+    autCommand = getAutoNavCommand();
   }
 
   /**
@@ -114,12 +117,11 @@ public class RobotContainer {
       DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
     }
 
-    RamseteCommand cmd = new RamseteCommand(trajectory, chassis::getPose,
+    OurRamseteCommand cmd = new OurRamseteCommand(trajectory, chassis::getPose,
         new RamseteController(Constants.RAMSETE_B, Constants.RAMSETE_ZETA),
         Constants.DRIVE_KINEMATICS, chassis::setVelocityOurFF, chassis);
 
-    chassis.resetOdometry(trajectory.getInitialPose());
-
+    
     return cmd.andThen(() -> chassis.setVelocity(0, 0));
   }
 
@@ -182,7 +184,8 @@ public class RobotContainer {
    */
   public Command[] getAutonomousCommands() {
     return new Command[] {
-        pickup.getarmMoveCommand()
+        //pickup.getarmMoveCommand()
+        autCommand
     };
   }
 

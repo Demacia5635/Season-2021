@@ -67,7 +67,7 @@ public class Shooting extends SubsystemBase {
 
     bonker.setNeutralMode(NeutralMode.Brake);
 
-    //setDefaultCommand(new RunCommand(this::getHoodBack, this));
+    setDefaultCommand(new RunCommand(this::getHoodBack, this));
   }
 
   /**

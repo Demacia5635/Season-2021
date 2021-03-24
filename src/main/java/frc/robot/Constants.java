@@ -69,8 +69,8 @@ public final class Constants {
     public static final double CHASSIS_KP = 0.0000145;
     public static final double CHASSIS_KI = 0;
     public static final double CHASSIS_KD = 0;
-    public static final double CHASSIS_KS = 0.638;
-    public static final double CHASSIS_KV = 2.28;
+    public static final double CHASSIS_KV = 0.65; // 0.638;
+    public static final double CHASSIS_KS = 2.784; // 2.28;
     public static final double CHASSIS_KA = 0.245;
 
     /**

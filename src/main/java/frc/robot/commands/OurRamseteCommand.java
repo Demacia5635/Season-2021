@@ -180,8 +180,9 @@ public class OurRamseteCommand extends CommandBase {
     var targetWheelSpeeds =
         m_kinematics.toWheelSpeeds(
             m_follower.calculate(myPose, timePose));
-    System.out.println("my pose: "+myPose.getY()+" "+ myPose.getX());
-    System.out.println("time pose: "+timePose.poseMeters.getY()+" "+timePose.poseMeters.getX());
+    //System.out.println("my pose: "+myPose.getY()+" "+ myPose.getX());
+    //System.out.println("time pose: "+timePose.poseMeters.getY()+" "+timePose.poseMeters.getX());
+    
 
     var leftSpeedSetpoint = targetWheelSpeeds.leftMetersPerSecond;
     var rightSpeedSetpoint = targetWheelSpeeds.rightMetersPerSecond;

@@ -13,15 +13,15 @@ import frc.robot.Constants;
  */
 public class FeedForward {
     
-    public static double K_HA = 6;
-    public static double K_LA = 0.25;
-    public static double K_S = Constants.CHASSIS_KS / 12 * 0.97; //0.22404
-    public static double K_V = Constants.CHASSIS_KV / 12 * 1.137; //0.04314
+    public static double K_HA = 0.127;
+    public static double K_LA = 0.0458;
+    public static double K_S = Constants.CHASSIS_KS / 12; //0.22404
+    public static double K_V = Constants.CHASSIS_KV / 12; //0.04314
     public static double MAX_BRAKEMODE = 0.05;
     public static double MIN_BRAKEMODE = 0.1;
     
     public static double feedForwardPower(double velocity) {
-        return velocity * K_V + K_S;
+        return velocity * K_S + K_V;
     }
     
     public static double feedForwardLeftPower(double leftVelocity, double rightVelocity) {

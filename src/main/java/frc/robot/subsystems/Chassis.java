@@ -22,11 +22,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
+import frc.robot.commands.Calibrate;
 import frc.robot.utils.FeedForward;
 import frc.robot.utils.GroupOfMotors;
 
@@ -41,6 +45,7 @@ public class Chassis extends SubsystemBase {
       Constants.CHASSIS_KS, Constants.CHASSIS_KV, Constants.CHASSIS_KA);
   private final Field2d field = new Field2d();
   private boolean isBrake = true;
+  public boolean isReversed = false; 
 
   /**
    * Creates a new Chassis.
@@ -54,6 +59,7 @@ public class Chassis extends SubsystemBase {
 
     rightFront.setInverted(true);
     rightBack.setInverted(true);
+    
 
     this.right = new GroupOfMotors(rightFront, rightBack);
     this.left = new GroupOfMotors(leftFront, leftBack);
@@ -72,15 +78,17 @@ public class Chassis extends SubsystemBase {
   }
 
   public double getFusedHeading() {
+    double res = 0;
     if (gyro != null) {
-      return gyro.getFusedHeading();
+      res =  gyro.getFusedHeading();
     } else {
       gyro = RobotContainer.gyro;
       if (gyro != null) {
-        return gyro.getFusedHeading();
+        res =  gyro.getFusedHeading();
       }
     }
-    return 0;
+    if (isReversed) return res + 180.0; 
+    return res; 
   }
 
   public double getAngle() {
@@ -101,18 +109,22 @@ public class Chassis extends SubsystemBase {
   }
 
   public double getRightPos() {
+    if (isReversed) return -left.getDistance();
     return right.getDistance();
   }
 
   public double getLeftPos() {
+    if (isReversed) return -right.getDistance();
     return left.getDistance();
   }
 
   public double getRightVelocity() {
+    if (isReversed) return -left.getVelocity();
     return right.getVelocity();
   }
 
   public double getLeftVelocity() {
+    if (isReversed) return -right.getVelocity();
     return left.getVelocity();
   }
 
@@ -193,7 +205,7 @@ public class Chassis extends SubsystemBase {
   public void resetOdometry(Pose2d pose) {
     this.left.resetEncoder();
     this.right.resetEncoder();
-    m_odometry.resetPosition(pose, Rotation2d.fromDegrees(gyro.getFusedHeading()));
+    m_odometry.resetPosition(pose, Rotation2d.fromDegrees(getFusedHeading()));
   }
 
   public double get_ks() {
@@ -319,7 +331,7 @@ public class Chassis extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    m_odometry.update(getRotation2d(), left.getDistance(), right.getDistance());
+    m_odometry.update(getRotation2d(), getLeftPos(), getRightPos());
     field.setRobotPose(m_odometry.getPoseMeters());
   }
 
@@ -366,7 +378,7 @@ public class Chassis extends SubsystemBase {
   }
 
   public Rotation2d getRotation2d() {
-    return Rotation2d.fromDegrees(gyro.getFusedHeading());//getAngle());
+    return Rotation2d.fromDegrees(getFusedHeading());//getAngle());
   }
 
   public double getAngle2Pose(Pose2d pose) {
@@ -374,9 +386,31 @@ public class Chassis extends SubsystemBase {
     return new Rotation2d(translation2d.getX(), translation2d.getY()).getDegrees();
   }
 
+  public void setReverse(boolean isReversed) {
+    if (this.isReversed != isReversed) {
+      this.isReversed = isReversed; 
+      resetOdometry(getPose());
+    }
+
+  }
+
+  public void setReverse() {
+    setReverse(!isReversed);
+  }
+
   public void setVelocityOurFF(double left, double right) {
-    this.left.setVelocity(left, FeedForward.feedForwardLeftPower(left, right));
-    this.right.setVelocity(right, FeedForward.feedForwardRightPower(left, right));
+    if (isReversed) {
+      this.left.setVelocity(-right, -FeedForward.feedForwardRightPower(left, right));
+      this.right.setVelocity(-left, -FeedForward.feedForwardLeftPower(left, right));
+    }
+    else {
+      this.left.setVelocity(left, FeedForward.feedForwardLeftPower(left, right));
+      this.right.setVelocity(right, FeedForward.feedForwardRightPower(left, right));
+    }
+  }
+
+  public Command getReverseCommand() {
+    return new InstantCommand(() -> setReverse()); 
   }
 
   public void setLeftPos(double distance) {
@@ -457,6 +491,17 @@ public class Chassis extends SubsystemBase {
     return getPose().getY();
   }
 
+  public void Calibrate(boolean b) {
+    try {
+      new Calibrate(this).schedule();
+    }
+    catch (Exception e) {
+      System.out.println("ERROR IN CALIBRATE " + e);
+    }
+  }
+
+  public boolean AlwaysTrue() { return true;  }
+
   @Override
   public void initSendable(SendableBuilder builder) {
     // builder.addDoubleProperty(key, getter, setter);
@@ -472,9 +517,9 @@ public class Chassis extends SubsystemBase {
     builder.addDoubleProperty("Right Motor power", this:: getRightMotorOutput, null);
     builder.addDoubleProperty("Pose X", this::getX, null);
     builder.addDoubleProperty("Pose Y", this::getY, null);
+    builder.addDoubleProperty("Galactic Path", RobotContainer::getGalacticPath, null);
+    // builder.addBooleanProperty("Calibrate", this::AlwaysTrue, this::Calibrate);
     
-
-  
   }
 
 }

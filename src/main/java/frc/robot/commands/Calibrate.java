@@ -41,12 +41,13 @@ public class Calibrate extends CommandBase {
     };
     // build the cmd to run all tests - with a 1 second wait in between
     cmd = null;
-    WaitCommand wait = new WaitCommand(1);
     for(Command c : cmds) {
       if(cmd == null) {
         cmd  = c;
       } else {
-        cmd = cmd.andThen(wait).andThen(c);
+        // cmd = cmd.andThen().andThen(c);
+        cmd = cmd.andThen(new WaitCommand(1)).andThen(c);
+        System.out.println("RUNNING OVER THE COMMANDS WHICH ARENT");
       }
     }
   }

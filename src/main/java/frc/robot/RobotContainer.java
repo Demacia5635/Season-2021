@@ -56,7 +56,7 @@ public class RobotContainer {
   private JoystickButton shootButton;
   private JoystickButton collectButton;
   private JoystickButton revRouletteButton;
-  Shoot shoot;
+  AutoShoot shoot;
   public static PigeonIMU gyro;
   private Command autCommand;
 
@@ -65,7 +65,7 @@ public class RobotContainer {
    */
   public RobotContainer() {
 
-    shoot = new Shoot(shooting, this::getVel, this::getAngle);
+    shoot = new AutoShoot(shooting, chassis);
     SmartDashboard.putData(chassis);
     SmartDashboard.putData(climb);
     SmartDashboard.putData(pickup);
@@ -74,6 +74,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
+    // autCommand = new Calibrate(this.chassis);
     autCommand = getAutoNavCommand();
   }
 
@@ -94,8 +95,7 @@ public class RobotContainer {
     revRouletteButton.whenReleased(new InstantCommand(() -> roulette.setRouletteVel(-30)));
     collectButton = new JoystickButton(mainController, XboxController.Button.kX.value);
     collectButton.whenHeld(pickup.getPickupCommand());
-    shootButton = new JoystickButton(mainController,
-    XboxController.Button.kB.value);
+    shootButton = new JoystickButton(mainController, XboxController.Button.kB.value);
     shootButton.whenHeld(shoot);
 
   }
@@ -106,23 +106,56 @@ public class RobotContainer {
    * 
    * @return the AutoNav command
    */
-  private Command getAutoNavCommand() {
-    final String trajectoryJSON = "paths/output/PartSlalom.wpilib.json";
-    Trajectory trajectory = new Trajectory();
+  private Command getBounceCommand() {
+    final String[] bouncers = new String[] { "paths/output/bouncer1.wpilib.json",
+                                             "paths/output/bouncer2.wpilib.json",
+                                             "paths/output/bouncer3.wpilib.json",
+                                             "paths/output/bouncer4.wpilib.json" };
 
-    try {
-      Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
-      trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
-    } catch (IOException ex) {
-      DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
+    Trajectory[] trajectory = new Trajectory[4];
+
+    for (int i = 0; i < bouncers.length; i++) {
+      try {
+        Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(bouncers[i]);
+        trajectory[i] = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+      } catch (IOException ex) {
+        DriverStation.reportError("Unable to open trajectory: " + bouncers[i], ex.getStackTrace());
+      }
     }
 
-    OurRamseteCommand cmd = new OurRamseteCommand(trajectory, chassis::getPose,
-        new RamseteController(Constants.RAMSETE_B, Constants.RAMSETE_ZETA),
-        Constants.DRIVE_KINEMATICS, chassis::setVelocityOurFF, chassis);
-
-    
+    Command cmd = null;
+    for (Trajectory t : trajectory) {
+      if (cmd == null) {
+        cmd = new OurRamseteCommand(t, chassis::getPose,
+            new RamseteController(Constants.RAMSETE_B, Constants.RAMSETE_ZETA),
+            Constants.DRIVE_KINEMATICS, chassis::setVelocityOurFF, chassis);
+      } else {
+        cmd = cmd.andThen(chassis.getReverseCommand())
+            .andThen(new OurRamseteCommand(t, chassis::getPose,
+                new RamseteController(Constants.RAMSETE_B, Constants.RAMSETE_ZETA),
+                Constants.DRIVE_KINEMATICS, chassis::setVelocityOurFF, chassis));
+      }
+    }
     return cmd.andThen(() -> chassis.setVelocity(0, 0));
+  }
+
+  private Command getAutoNavCommand() {
+    final String path = "paths/output/Slalom.wpilib.json";
+
+    Trajectory trajectory;
+
+    try {
+      Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(path);
+      trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+      return new OurRamseteCommand(trajectory, chassis::getPose,
+          new RamseteController(Constants.RAMSETE_B, Constants.RAMSETE_ZETA),
+          Constants.DRIVE_KINEMATICS, chassis::setVelocityOurFF, chassis)
+              .andThen(() -> chassis.setVelocity(0, 0));
+    } catch (IOException ex) {
+      DriverStation.reportError("Unable to open trajectory: " + path, ex.getStackTrace());
+    }
+
+    return null;
   }
 
   /**
@@ -169,6 +202,37 @@ public class RobotContainer {
         }) /* , new ArmChange(ArmChange.Position.Top, pickup) */);
   }
 
+  public static int getGalacticPath() {
+    double angleToNearestBall = SmartDashboard.getNumber("BallAngle", 0);
+    double distanceToNearestBall = SmartDashboard.getNumber("BallDistance", 0);
+
+    if (distanceToNearestBall == 0) {
+      return 0;
+    }
+
+    // Path A
+    if (Math.abs(angleToNearestBall) <= 2) {
+      if (distanceToNearestBall < Constants.CHALLENGE_SPACE_WIDTH / 2) {
+        return 1;
+      }
+
+      // Blue path
+      return 2;
+    }
+
+    // Path B
+
+    // Red path
+    if (distanceToNearestBall * Math.cos(Math.toRadians(angleToNearestBall)) <= 140
+        * Constants.INCHES_TO_METERS) {
+      return 3;
+    }
+
+    // Blue path
+    return 4;
+
+  }
+
   public double getAngle() {
     return SmartDashboard.getNumber("ShootAngle", 5);
   }
@@ -184,9 +248,8 @@ public class RobotContainer {
    */
   public Command[] getAutonomousCommands() {
     return new Command[] {
-        //pickup.getarmMoveCommand()
-        autCommand
-    };
+                           // pickup.getarmMoveCommand()
+                           autCommand };
   }
 
   public Command[] getTeleopCommands() {

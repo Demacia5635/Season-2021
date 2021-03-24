@@ -41,7 +41,7 @@ public class Pickup extends SubsystemBase {
     RobotContainer.gyro = gyro;
     armMotor.configForwardSoftLimitThreshold(Constants.MAX_ARM_POS);
     armMotor.configForwardSoftLimitEnable(true);
-    //setDefaultCommand(getarmMoveCommand());
+    setDefaultCommand(getarmMoveCommand());
   }
 
   /**
